@@ -8,6 +8,9 @@ import { PatternEmitter } from "./patternEmitter";
 export type EventEmitterType = string | symbol;
 export type EventPattern = RegExp | EventEmitterType;
 
+/**
+ * This is like the native declaration of emitter listener function
+ */
 export type PatternListener = (...args: any[]) => void;
 
 

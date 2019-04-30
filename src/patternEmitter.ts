@@ -2,7 +2,7 @@
  * @module PatternEmitter
  */
 
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
 
 import { IPatternEmitter } from "./interface";
 
@@ -31,6 +31,10 @@ export class PatternEmitter implements IPatternEmitter{
     private _addListener: EventEmitterInterfaceFunction;
     private _removeListener: EventEmitterInterfaceFunction;
     private _once: EventEmitterInterfaceFunction;
+    /**
+     * Private function strored native implementation for eventEmitter
+     */
+    private _emitterListeners:  (type: EventEmitterType) => Function[];
 
     private _emit: (type: string | symbol, ...rest: any[]) => boolean;
     private _removeAllListeners: (type?: EventEmitterType) => EventEmitter;
@@ -82,6 +86,7 @@ export class PatternEmitter implements IPatternEmitter{
         this._removeListener = this._emitter.removeListener.bind(this);
         this._removeAllListeners = this._emitter.removeAllListeners.bind(this);
         this._once = this._emitter.once.bind(this);
+        this._emitterListeners = this._emitter.listeners.bind(this);
 
         this.on =  this.addListener;
         this.off =  this.removeListener;
@@ -104,7 +109,6 @@ export class PatternEmitter implements IPatternEmitter{
         }
 
         const matchingListeners = this.getMatchingListeners(type);
-
 
         matchingListeners.forEach((listener: PatternListener) => {
             listener.bind(this)(...rest);
@@ -171,6 +175,7 @@ export class PatternEmitter implements IPatternEmitter{
         // ** push the new listener under the right array
         if (typeListenerd) {
             typeListenerd.push(listener);
+            this._regexesCount++;
         }
 
         return this;
@@ -333,7 +338,7 @@ export class PatternEmitter implements IPatternEmitter{
 
             // ** AVAR::NOTE adding the string and symbol listeners
             // @todo review the type transformation
-            matchingListeners.push(...this._emitter.listeners(type) as PatternListener[]);
+            matchingListeners.push(...this._emitterListeners(type) as PatternListener[]);
         }
 
         /**

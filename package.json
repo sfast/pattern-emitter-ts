@@ -20,6 +20,7 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/events": "^3.0.0",
     "@types/node": "^11.13.8",
     "gts": "^1.0.0",
     "typedoc": "^0.14.2",
