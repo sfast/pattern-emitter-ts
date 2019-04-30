@@ -1,0 +1,14 @@
+{
+  "common":{
+    "rootDir":".",
+    "tsConfig":"tsconfig.json"
+  },
+  "instrument":{
+    "instrumentCallExpressions":true,
+    "instrumentImplicitThis":true,
+    "skipTwizDeclarations":true
+  },
+  "applyTypes":{
+    "prefix":"TypeWiz |"
+  }
+}

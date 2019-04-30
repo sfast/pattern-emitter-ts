@@ -24,6 +24,8 @@
     "gts": "^1.0.0",
     "typedoc": "^0.14.2",
     "typedoc-plugin-external-module-name": "^2.0.0",
-    "typescript": "~3.4.0"
+    "typescript": "~3.4.0",
+    "typewiz": "^1.2.4",
+    "typewiz-core": "^1.2.4"
   }
 }
