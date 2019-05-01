@@ -15,6 +15,13 @@ import {
 } from "./types";
 
 /**
+ * This is the global listener index allowing us to call the handlers in the exact sequence
+ * @type {number}
+ * @private
+ */
+let _globalListenerIndex = 1;
+
+/**
  * Creates a new PatternEmitter, which composites EventEmitter. In addition to
  * EventEmitter's prototype, it allows listeners to register to events matching
  * a RegExp.
@@ -126,7 +133,7 @@ export class PatternEmitter implements IPatternEmitter{
     public once(type: EventPattern, listener: PatternListener) {
         /* ** the standart*/
         if (!(type instanceof RegExp)) {
-            return this._once(type, listener);
+            return this._once(type, this.wrapListener(listener));
         }
 
         const onceWrap = (type: EventPattern, listener: PatternListener) => {
@@ -151,6 +158,7 @@ export class PatternEmitter implements IPatternEmitter{
      * @returns {PatternEmitter} This instance
      */
     public addListener(type: EventPattern, listener: PatternListener) {
+        listener = this.wrapListener(listener);
         // ** the standart
         if (!(type instanceof RegExp)) {
             return this._addListener(type, listener);
@@ -344,6 +352,18 @@ export class PatternEmitter implements IPatternEmitter{
         /**
          * @todo maybe we should add index and sort listeners by index
          */
-        return matchingListeners;
+        return matchingListeners.sort((a: any, b: any) => {
+            return a.idx - b.idx;
+        });
+    }
+
+    private wrapListener(listener: PatternListener): PatternListener {
+        const wrapedListener =(type: EventPattern, ...rest: any[]) => {
+            listener(type, ...rest);
+        };
+
+        wrapedListener.idx = _globalListenerIndex;
+        _globalListenerIndex++;
+        return wrapedListener;
     }
 }
