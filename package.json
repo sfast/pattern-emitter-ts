@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "keywords": [],
   "scripts": {
-    "test": "jest",
+    "test": "mocha -r ts-node/register tests/*.ts --timeout 100000 --exit",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
@@ -20,8 +20,9 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
     "@types/events": "^3.0.0",
-    "@types/jest": "^24.0.12",
+    "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.8",
     "gts": "^1.0.0",
     "jest": "^24.7.1",
@@ -30,10 +31,12 @@
     "typedoc-plugin-external-module-name": "^2.0.0",
     "typescript": "~3.4.0",
     "typewiz": "^1.2.4",
-    "typewiz-core": "^1.2.4"
+    "typewiz-core": "^1.2.4",
+    "typings": "^2.1.1"
   },
   "dependencies": {
-    "@types/chai": "^4.1.7",
-    "ts-sinon": "^1.0.17"
+    "@types/expect": "^1.20.4",
+    "chai": "^4.2.0",
+    "expect": "^24.7.1"
   }
 }
