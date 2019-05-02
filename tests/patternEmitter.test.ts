@@ -10,17 +10,17 @@ describe('PatternEmitter', () => {
 
   describe('emit', () => {
     it('returns false if no listeners match the event', function() {
-      var invoked = false;
+      let invoked = false;
 
-      emitter.on(/^t.*/, function() {
+      emitter.on(/^t.*/, () => {
         invoked = true;
       });
 
-      emitter.on('invalid', function() {
+      emitter.on('invalid', () => {
         invoked = true;
       });
 
-      var result = emitter.emit('noMatch');
+      let result = emitter.emit('noMatch');
 
       expect(invoked).to.equal(false);
       expect(result).to.equal(false);
@@ -28,7 +28,7 @@ describe('PatternEmitter', () => {
 
     it('returns true if a listener matches the event', () => {
       emitter.on('test', () => {});
-      var result = emitter.emit('test');
+      let result = emitter.emit('test');
 
       expect(result).to.equal(true);
     });
@@ -73,19 +73,19 @@ describe('PatternEmitter', () => {
     });
 
     it('invokes all matching listeners', () =>  {
-      var x = 0;
-      var y = 0;
-      var z = 0;
+      let x = 0;
+      let y = 0;
+      let z = 0;
 
-      var listener1 = () => {
+      const listener1 = () => {
         x++;
       };
 
-      var listener2 = () => {
+      const listener2 = () => {
         y++;
       };
 
-      var listener3 = () => {
+      const listener3 = () => {
         z++;
       };
 
@@ -104,17 +104,19 @@ describe('PatternEmitter', () => {
       expect(z).to.equal(2);
     });
 
-    it('can be called multiple times', () => {
-      var counter = 0;
+    it('emit can be called multiple times', () => {
+      let counter = 0;
       emitter.on(/[t]/, () => {
         counter++;
       });
 
-      emitter.emit('test');
+      emitter.emit('test1');
       expect(counter).to.equal(1);
-      emitter.emit('test');
+
+      emitter.emit('test2');
       expect(counter).to.equal(2);
     });
+
   });
 
   describe('once', function() {
@@ -123,7 +125,7 @@ describe('PatternEmitter', () => {
   });
  
   describe('addListener', () => {
-    
+
   });
 
   
