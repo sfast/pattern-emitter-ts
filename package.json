@@ -10,7 +10,8 @@
   "license": "Apache-2.0",
   "keywords": [],
   "scripts": {
-    "test": "mocha -r ts-node/register tests/*.ts --timeout 100000 --exit",
+    "test:coverage": "nyc mocha -r ts-node/register test/*.test.ts",
+    "test": "mocha -r ts-node/register test/*.ts --timeout 100000 --exit",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
@@ -36,7 +37,10 @@
   },
   "dependencies": {
     "@types/expect": "^1.20.4",
+    "@types/sinon": "^7.0.11",
     "chai": "^4.2.0",
-    "expect": "^24.7.1"
+    "expect": "^24.7.1",
+    "nyc": "^14.0.0",
+    "ts-sinon": "^1.0.17"
   }
 }
