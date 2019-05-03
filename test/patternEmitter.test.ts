@@ -1,6 +1,7 @@
 import { PatternEmitter } from '../src';
 import { EventEmitter } from 'events';
 import { expect } from 'chai';
+import { emit } from 'cluster';
 // import { stub } from 'sinon';
 // import * as sinon from "ts-sinon";
 
@@ -145,7 +146,10 @@ describe('PatternEmitter', () => {
 
   describe('addListener', () => {
     it("calls _addListener if type isn't a RegExp", () => {
-
+      //from
+    });
+    it('can add multiple listeners for the same pattern', () => {
+      //from
     });
     it("adds type and its appropriate string(type) as a value to _regexMap map if type is a RegExp", () => {
 
@@ -168,11 +172,11 @@ describe('PatternEmitter', () => {
     it("removes listener from _listeners map's appropriate pattern's array", () => {
 
     });
-    it("removes the pattern _listeners map if that pattern has no other listeners", () => {
+    it("removes the pattern from _listeners map if no other listeners exist for the pattern'", () => {
 
     });
-    it("removes the listener from _events if type isn't a RegExp", () => { 
-
+    it("calls _removeListener if type isn't a RegExp", () => {
+      //from
     });
   });
 
@@ -230,14 +234,14 @@ describe('PatternEmitter', () => {
       emitter.on('test', (data) => {
         arrOfDatas.push(`${data}:0`);
       });
-      emitter.on('test', (data) => {
+      emitter.on(/^t.*/, (data) => {
         arrOfDatas.push(`${data}:1`);
       });
       emitter.on('test', (data) => {
         arrOfDatas.push(`${data}:2`);
       });
 
-      emitter.on('test', (data) => {
+      emitter.on(/^t\w{3}/, (data) => {
         arrOfDatas.push(`${data}:3`);
       });
       
