@@ -119,7 +119,7 @@ describe('PatternEmitter', () => {
   });
 
   describe('once', () => {
-    it('adds a listener that can be invoked at most once', () => {
+    it('adds a listener that can be invoked at most once for regexp', () => {
       let counter = 0;
       const listener = () => {
         counter++;
@@ -141,11 +141,23 @@ describe('PatternEmitter', () => {
       // console.log(emitter._regexesCount);
       expect(counter).to.equal(1);
     });
+    it('adds a listener that can be invoked at most once for string', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
+      
+      emitter.once('test', listener);
+      emitter.emit('test');
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+    });
+
   });
 
   describe('addListener', () => {
     it("calls _addListener if type isn't a RegExp", () => {
-
+      
     });
     it("adds type and its appropriate string(type) as a value to _regexMap map if type is a RegExp", () => {
 
@@ -159,12 +171,30 @@ describe('PatternEmitter', () => {
   });
 
   describe('on', () => {
-    it('is an alias for addListener', function() {
+    it('is an alias for addListener', () => {
       expect(emitter.on).to.equal(emitter.addListener);
     });
   });
 
+  describe('off', () => {
+    it('is an alias for removeListener', () => {
+      expect(emitter.off).to.equal(emitter.removeListener);
+    });
+  });
+
   describe('removeListener', () => {
+    it("listener doesn't called if it removed", () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
+      emitter.on("test", listener);
+      emitter.emit("test");
+      emitter.off("test", listener);
+      emitter.emit("test");
+      expect(counter).to.equal(1);      
+    });
+
     it("removes listener from _listeners map's appropriate pattern's array", () => {
 
     });
@@ -174,6 +204,7 @@ describe('PatternEmitter', () => {
     it("removes the listener from _events if type isn't a RegExp", () => { 
 
     });
+
   });
 
   describe('removeAllListeners', () => {

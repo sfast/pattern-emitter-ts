@@ -3,10 +3,11 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "sourceMap": true,
   },
   "include": [
     "src/**/*.ts",
-    "tests/**/*.ts"
+    "test/**/*.ts"
   ]
 }
