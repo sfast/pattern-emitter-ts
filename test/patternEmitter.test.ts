@@ -198,16 +198,51 @@ describe('PatternEmitter', () => {
   });
 
   describe('order', () => {
-    it('calls matching listeners with order and listeners get data', () => {
-      let arrOfDatas: any = []
-      emitter.on(/^t.*'/, (data) => {
+    it('calls matching listeners with order and listeners get data for regexps', () => {
+      let arrOfDatas: any = [];
+
+      emitter.on(/^t.*/, (data) => {
         arrOfDatas.push(`${data}:1`);
       });
       emitter.on(/^t\w{3}/, (data) => {
         arrOfDatas.push(`${data}:2`);
       });
+      
       emitter.emit('test', "data");
-      expect(arrOfDatas).to.equal(['data:1', 'data:2']);
+      expect(arrOfDatas).to.eql(['data:1', 'data:2']);
+    });
+    it('calls matching listeners with order and listeners get data for strings', () => {
+      let arrOfDatas: any = [];
+
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:1`);
+      });
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:2`);
+      });
+      
+      emitter.emit('test', "data");
+      expect(arrOfDatas).to.eql(['data:1', 'data:2']);
+    });
+    it('calls matching listeners with order and listeners get data for strings and regexps', () => {
+      let arrOfDatas: any = [];
+
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:0`);
+      });
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:1`);
+      });
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:2`);
+      });
+
+      emitter.on('test', (data) => {
+        arrOfDatas.push(`${data}:3`);
+      });
+      
+      emitter.emit('test', "data");
+      expect(arrOfDatas).to.eql(['data:0', 'data:1', 'data:2', 'data:3']);
     });
   });
 });
