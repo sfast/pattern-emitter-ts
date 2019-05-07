@@ -71,7 +71,7 @@ export class PatternEmitter implements IPatternEmitter {
   // @todo public prependOnceListener: PatternEmitterInterfaceFunction;
 
   constructor() {
-    this._emitter = new EventEmitter();
+	this._emitter = new EventEmitter();
 
     this._regexesCount = 0;
     this._listeners = new Map<EventPattern, PatternListener[]>();
@@ -104,17 +104,17 @@ export class PatternEmitter implements IPatternEmitter {
     if (!this._regexesCount) {
       return this._emit(type, ...rest);
     }
-    console.log('hereeee');
+    
 
     const matchingListeners = this.getMatchingListeners(type);
 
     matchingListeners.forEach((listener: PatternListener) => {
-      console.log('listener::::::::', listener);
+      
 
       listener.bind(this)(...rest); //?????????????
     });
 
-    console.log('matchingListeners.length:', matchingListeners.length);
+    
 
     return matchingListeners.length > 0;
   }
@@ -180,7 +180,7 @@ export class PatternEmitter implements IPatternEmitter {
       this._regexesCount++;
     }
 
-    console.log('this:', this);
+    
 
     return this;
   }
@@ -284,7 +284,7 @@ export class PatternEmitter implements IPatternEmitter {
     const pattern: string = String(regex);
 
     const listeners = this._listeners.get(pattern);
-    console.log('listeners>>>>>>>>>>', listeners);
+    
 
     return listeners ? listeners : new Array<PatternListener>();
   }
@@ -316,19 +316,19 @@ export class PatternEmitter implements IPatternEmitter {
    * @private
    */
   private getMatchingListeners(type: EventEmitterType) {
-    console.log('type>>>>>>>', type);
+    
     const matchingListeners = new Array<PatternListener>();
     if (typeof type === 'string') {
       this._regexMap.forEach((regexp: RegExp /* patternKey: string */) => {
         if (regexp && regexp instanceof RegExp) {
-          console.log('regexp:::::', regexp);
+          
 
           /**
            * Testing the type with the regexp
            */
           if (regexp.test(type)) {
             matchingListeners.push(...this.patternListeners(regexp));
-            console.log('============>>>>', matchingListeners);
+            
           }
         }
       });
@@ -338,7 +338,7 @@ export class PatternEmitter implements IPatternEmitter {
       matchingListeners.push(
         ...(this._emitterListeners(type) as PatternListener[])
       );
-      console.log('============', matchingListeners);
+      
     }
 
     /**
