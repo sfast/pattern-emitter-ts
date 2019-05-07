@@ -129,17 +129,6 @@ describe('PatternEmitter', () => {
       emitter.once(/[a-z]/, listener);
       emitter.emit('test');
       emitter.emit('test');
-
-      // how to test method which has private method or property in it and the testing functionality depends on that privates,
-      // check
-      // const stubObject = sinon.stubObject;
-      // const testStub = stubObject<PatternEmitter>(emitter);
-      // 
-
-      // stub(PatternEmitter.prototype, <any>"_regexesCount")
-      // let a = stub(PatternEmitter.prototype, <any>"_emit");
-      // 
-      // 
       expect(counter).to.equal(1);
     });
     it('adds a listener that can be invoked at most once for string', () => {
@@ -213,9 +202,15 @@ describe('PatternEmitter', () => {
     });
   });
 
+  describe('off', () => {
+    it('is an alias for removeListener', () => {
+      expect(emitter.off).to.equal(emitter.removeListener);
+    });
+  });
+
   describe('removeListener', () => {
 
-    it("removes listener from _listeners map's appropriate pattern's array if the given type is RegExp", () => {
+	it("removes listener from _listeners map's appropriate pattern's array if the given type is RegExp", () => {
       let counter = 0;
       const listener = () => {
         counter++;
