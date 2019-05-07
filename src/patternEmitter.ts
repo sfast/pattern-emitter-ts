@@ -150,7 +150,7 @@ export class PatternEmitter implements IPatternEmitter {
    * @returns {PatternEmitter} This instance
    */
   public addListener(type: EventPattern, listener: PatternListener) {
-    listener = this.wrapListener(listener);
+    const wrapedListener = this.wrapListener(listener);
     // ** the standard
     if (!(type instanceof RegExp)) {
       return this._addListener(type, listener);
@@ -176,7 +176,7 @@ export class PatternEmitter implements IPatternEmitter {
 
     // ** push the new listener under the right array
     if (typeListenerd) {
-      typeListenerd.push(listener);
+      typeListenerd.push(wrapedListener);
       this._regexesCount++;
     }
 
@@ -197,8 +197,6 @@ export class PatternEmitter implements IPatternEmitter {
     const wrappedListener = this.wrapListener(listener);
 
     if (!(type instanceof RegExp)) {
-        console.log("hereeeeee");
-        
         return this._removeListener(type, listener);
     }
 
@@ -234,28 +232,21 @@ export class PatternEmitter implements IPatternEmitter {
    */
   public removeAllListeners(type?: EventPattern) {
     if (!(type instanceof RegExp)) {
-      this._removeAllListeners(type);
-      console.log("this._listeners>>>>>", this._listeners);
-      return this._removeAllListeners(type);
+      this._removeAllListeners(type); //deleted return
     }
-
     if (type) {
       const pattern: string = String(type);
       if (this._listeners.has(pattern)) {
-        this._listeners.delete(pattern);
+		this._listeners.delete(pattern);
         this._regexMap.delete(pattern);
         this._regexesCount--;
-        // console.log("this._listeners>>>>>", this._listeners);
       }
-    } else {
-      this._listeners.clear();
-      // console.log("this._listeners>>>>>", this._listeners);
-
-      this._regexMap.clear();
-      this._regexesCount = 0;
+    } else {	
+		this._removeAllListeners();
+		this._listeners.clear();
+		this._regexMap.clear();
+		this._regexesCount = 0;
     }
-    // console.log("this._listeners>>>>>", this._listeners);
-
     return this;
   }
 

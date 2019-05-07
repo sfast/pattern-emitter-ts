@@ -73,7 +73,7 @@ describe('PatternEmitter', () => {
       expect(allArgs).to.eql(['arg1', 'arg2', 'arg3']);
     });
 
-    it('invokes all matching listeners', () => {
+		    it('invokes all matching listeners', () => {
       let x = 0;
       let y = 0;
       let z = 0;
@@ -196,17 +196,14 @@ describe('PatternEmitter', () => {
     });
 
     it("removes listener from _listeners map's appropriate pattern's array if the given type is String", () => {
-      let counter = 0;
-      const listener = () => {
-        counter++;
-      };
+      const listener = () => {};
       emitter.addListener('test', listener);
+      emitter.addListener('test', () => {});
+
       emitter.emit('test');    
-      expect(counter).to.equal(1);
-      emitter.removeListener('test', listener);
-      emitter.emit('test');
-      
-      expect(counter).to.equal(1);
+      emitter.removeListener('test', listener);   
+
+      expect(emitter.listenerCount('test')).to.equal(1);
     });
     // it("removes the pattern from _listeners map if no other listeners exist for the pattern'", () => {
 
@@ -216,45 +213,51 @@ describe('PatternEmitter', () => {
     // });
   });
 
-  // describe('removeAllListeners', () => {
-  //   it('removes all listeners if type not given', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener(/test/, listener);
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(3);
-  //     console.log("before:", emitter);
-  //     emitter.removeAllListeners();
-  //     // console.log("after:", emitter);
-  //     expect(counter).to.equal(0);
-  //   });
+  describe('removeAllListeners', () => {
+    it('removes all listeners if type not given', () => {
+		const listener = () => {};
+		emitter.addListener('test', listener);
+		emitter.addListener('test', listener);
+		emitter.addListener(/test/, listener);
+		
+		emitter.emit('test');
+		expect(emitter.listenerCount('test')).to.equal(3);
 
-//     it('removes all listeners of given type', () => {
-//       let counter = 0;
-//       let listener = () => {
-//         counter++;
-//       }
-//       emitter.addListener('test', listener);
-//       emitter.addListener('test', listener);
-//       emitter.addListener(/test/, listener);
-//       emitter.emit('test');
-//       expect(counter).to.equal(3);
-//       // console.log(emitter);
-//       emitter.removeAllListeners("test");
-//       expect(counter).to.equal(0);
-//     })
+		emitter.removeAllListeners();
+		
+		expect(emitter.emit('test')).to.equal(false);
+		expect(emitter.listenerCount('test')).to.equal(0);
+    });
+
+    it('removes all listeners of given type for string', () => {
+		const listener = () => {};
+		emitter.addListener('test', listener);
+		emitter.addListener('test', () => {});
+		
+		emitter.emit('test');
+		emitter.removeAllListeners("test");
+		
+		expect(emitter.listenerCount('test')).to.equal(0);
+	});
+	
+	it('removes all listeners of given type for regexp', () => {
+		const listener = () => {};
+		emitter.addListener(/test/, listener);
+		emitter.addListener(/test/, () => {});
+
+		emitter.emit('test');
+		emitter.removeAllListeners(/test/);		
+
+		expect(emitter.emit('test')).to.equal(false);
+	  });
     
 
-//     it('removes all listeners for a given pattern from _listeners and removes the pattern from _regexMap if the type is given', () => {
+    // it('removes all listeners for a given pattern from _listeners and removes the pattern from _regexMap if the type is given', () => {
 
-//     });
-//     it('clears _listeners and _regexMap maps if the type not given', () => {
+    // });
+    // it('clears _listeners and _regexMap maps if the type not given', () => {
 
-//     });
+    // });
   });
 
  describe('listeners', () => {
@@ -331,7 +334,9 @@ describe('PatternEmitter', () => {
         arrOfDatas.push(`${data}:3`);
       });
       
-      emitter.emit('test', "data");      
+	  emitter.emit('test', "data");  
+	  console.log(">>>>>>>>", arrOfDatas);
+	      
       expect(arrOfDatas).to.eql(['data:1', 'data:3', 'data:0', 'data:2']); //is it ok?
 
     });
