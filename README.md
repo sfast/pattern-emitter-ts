@@ -6,7 +6,8 @@ Run the ```npm run doc``` command to generate a Typedoc under ```tsdoc``` folder
 ### Test
 Run the tests with a simple ```npm t``` .
 Run in watch mode with ```npm t -- --watch```.
-Run test for coverage with ```npm run test:coverage```
+Run test for coverage with ```npm test:coverage```
+Run test and check coverage with ```npm test:cover```
 
 ### Type coverage
 

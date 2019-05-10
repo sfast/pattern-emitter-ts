@@ -286,7 +286,7 @@ describe('PatternEmitter', () => {
       emitter.on(/^.*/, listener1);
       emitter.on("test", listener1);
       emitter.emit('test');
-      // 
+      console.log("listeners>>>>>>", emitter.listeners('test'));
       // expect(emitter.listeners('test')).to.have.same.members([{"idx": 0}, {"idx": 1}, {"idx": 2}, {"idx": 3}]);
     });
   });
