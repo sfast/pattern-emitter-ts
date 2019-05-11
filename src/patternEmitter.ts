@@ -194,11 +194,11 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {PatternEmitter | EventEmitter}
    */
   public removeListener(type: EventPattern, listener: PatternListener) {
-    const wrappedListener = this.wrapListener(listener);
-
     if (!(type instanceof RegExp)) {
         return this._removeListener(type, listener);
     }
+
+    const wrappedListener = this.wrapListener(listener);
 
     const regex: RegExp = type;
     // AVAR::NOTE string representation of the regexp
@@ -287,17 +287,6 @@ export class PatternEmitter implements IPatternEmitter {
     
 
     return listeners ? listeners : new Array<PatternListener>();
-  }
-
-  /**
-   * Returns the number of listeners registered to the emitter for the specified
-   * pattern.
-   * @param {RegExp} regexp
-   * @return {number}
-   */
-  private patternListenerCount(regexp: RegExp): number {
-    const patternListeners = this.patternListeners(regexp);
-    return patternListeners.length;
   }
 
   /**

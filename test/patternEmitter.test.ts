@@ -1,12 +1,9 @@
 import { PatternEmitter } from '../src';
-import { EventEmitter } from 'events';
-import { expect } from 'chai';
-import { emit } from 'cluster';
-// import { stub } from 'sinon';
-// import * as sinon from "ts-sinon";
+import { expect } from "chai";
 
 describe('PatternEmitter', () => {
   let emitter: PatternEmitter;
+
   beforeEach(() => {
     emitter = new PatternEmitter();
   });
@@ -54,17 +51,15 @@ describe('PatternEmitter', () => {
       emitter.on(/^hi/, () => {
         invokedCount++;
       });
-      emitter.on('hi::1', () => {
-        invokedCount++;
-      });
+
       emitter.emit('hi::1', 'emitted');
 
-      expect(invokedCount).to.equal(2);
+      expect(invokedCount).to.equal(1);
     });
 
     it('invokes the listener with any additional arguments', () => {
       let allArgs;
-      emitter.on(/^t\w{3}/, (...args) => {
+      emitter.on(/^t\w{3}/, (...args: any[]) => {
         allArgs = [...args];
       });
 
@@ -73,7 +68,7 @@ describe('PatternEmitter', () => {
       expect(allArgs).to.eql(['arg1', 'arg2', 'arg3']);
     });
 
-		    it('invokes all matching listeners', () => {
+    it('invokes all matching listeners', () => {
       let x = 0;
       let y = 0;
       let z = 0;
@@ -131,6 +126,7 @@ describe('PatternEmitter', () => {
       emitter.emit('test');
       expect(counter).to.equal(1);
     });
+
     it('adds a listener that can be invoked at most once for string', () => {
       let counter = 0;
       const listener = () => {
@@ -154,6 +150,7 @@ describe('PatternEmitter', () => {
 		emitter.emit('test');
 		expect(counter).to.equal(1);
 	});
+
 	it("adds listener if type is string", () => {
 		let counter = 0;
 		const listener = () => {
@@ -163,6 +160,7 @@ describe('PatternEmitter', () => {
 		emitter.emit('test');
 		expect(counter).to.equal(1);
     });
+
     it('can add multiple listeners for the same pattern', () => {
 		let counter = 0;
 		const listener1 = () => {
@@ -181,6 +179,7 @@ describe('PatternEmitter', () => {
 		expect(emitter.listenerCount('test')).to.equal(3);
 		expect(counter).to.equal(3);
 	});
+
 	it('can add same listeners for the same pattern', () => {
 		let counter = 0;
 		const listener = () => {
@@ -275,6 +274,7 @@ describe('PatternEmitter', () => {
 	  });
   });
 
+  //@todo
  describe('listeners', () => {
     it('returns array of all listeners for the given pattern', () => {
       PatternEmitter._globalListenerIndex = 0;
@@ -307,10 +307,10 @@ describe('PatternEmitter', () => {
     it('calls matching listeners with order and listeners get data for regexps', () => {
       const arrOfDatas: any = [];
 
-      emitter.on(/^t.*/, (data) => {
+      emitter.on(/^t.*/, (data: any) => {
         arrOfDatas.push(`${data}:1`);
       });
-      emitter.on(/^t\w{3}/, (data) => {
+      emitter.on(/^t\w{3}/, (data: any) => {
         arrOfDatas.push(`${data}:2`);
       });
       
@@ -321,10 +321,10 @@ describe('PatternEmitter', () => {
     it('calls matching listeners with order and listeners get data for strings', () => {
 		const arrOfDatas: any = [];
 
-		emitter.on('test', (data) => {
+		emitter.on('test', (data: any) => {
 			arrOfDatas.push(`${data}:1`);
 		});
-		emitter.on('test', (data) => {
+		emitter.on('test', (data: any) => {
 			arrOfDatas.push(`${data}:2`);
 		});
 		
@@ -335,17 +335,17 @@ describe('PatternEmitter', () => {
     it('calls matching listeners with order and listeners get data for strings and regexps', () => {
       const arrOfDatas: any = [];
 
-      emitter.on('test', (data) => {
+      emitter.on('test', (data: any) => {
         arrOfDatas.push(`${data}:0`);
       });
-      emitter.on(/^t.*/, (data) => {
+      emitter.on(/^t.*/, (data: any) => {
         arrOfDatas.push(`${data}:1`);
       });
-      emitter.on('test', (data) => {
+      emitter.on('test', (data: any) => {
         arrOfDatas.push(`${data}:2`);
       });
 
-      emitter.on(/^t\w{3}/, (data) => {
+      emitter.on(/^t\w{3}/, (data: any) => {
         arrOfDatas.push(`${data}:3`);
       });
       
