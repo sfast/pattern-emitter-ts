@@ -10,8 +10,9 @@
   "license": "Apache-2.0",
   "keywords": [],
   "scripts": {
-    "test:coverage": "nyc mocha -r ts-node/register test/*.test.ts",
+    "test:cover": "NODE_ENV=test  jest --detectOpenHandles --forceExit",
     "test": "mocha -r ts-node/register test/*.ts --timeout 100000 --exit",
+    "test:coverage": "nyc mocha -r ts-node/register test/*.test.ts",
     "check": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
