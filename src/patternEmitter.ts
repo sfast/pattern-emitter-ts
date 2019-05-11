@@ -71,7 +71,7 @@ export class PatternEmitter implements IPatternEmitter {
   // @todo public prependOnceListener: PatternEmitterInterfaceFunction;
 
   constructor() {
-	this._emitter = new EventEmitter();
+    this._emitter = new EventEmitter();
 
     this._regexesCount = 0;
     this._listeners = new Map<EventPattern, PatternListener[]>();
@@ -104,17 +104,12 @@ export class PatternEmitter implements IPatternEmitter {
     if (!this._regexesCount) {
       return this._emit(type, ...rest);
     }
-    
 
     const matchingListeners = this.getMatchingListeners(type);
 
     matchingListeners.forEach((listener: PatternListener) => {
-      
-
       listener.bind(this)(...rest); //?????????????
     });
-
-    
 
     return matchingListeners.length > 0;
   }
@@ -180,8 +175,6 @@ export class PatternEmitter implements IPatternEmitter {
       this._regexesCount++;
     }
 
-    
-
     return this;
   }
 
@@ -195,7 +188,7 @@ export class PatternEmitter implements IPatternEmitter {
    */
   public removeListener(type: EventPattern, listener: PatternListener) {
     if (!(type instanceof RegExp)) {
-        return this._removeListener(type, listener);
+      return this._removeListener(type, listener);
     }
 
     const wrappedListener = this.wrapListener(listener);
@@ -207,7 +200,6 @@ export class PatternEmitter implements IPatternEmitter {
     const matchingListenersArray = this._listeners.get(pattern);
 
     if (matchingListenersArray instanceof Array) {
-
       const arrWithRemovedListener = matchingListenersArray.filter(
         (value, index, arr) => {
           return value !== wrappedListener;
@@ -237,15 +229,15 @@ export class PatternEmitter implements IPatternEmitter {
     if (type) {
       const pattern: string = String(type);
       if (this._listeners.has(pattern)) {
-		this._listeners.delete(pattern);
+        this._listeners.delete(pattern);
         this._regexMap.delete(pattern);
         this._regexesCount--;
       }
-    } else {	
-		this._removeAllListeners();
-		this._listeners.clear();
-		this._regexMap.clear();
-		this._regexesCount = 0;
+    } else {
+      this._removeAllListeners();
+      this._listeners.clear();
+      this._regexMap.clear();
+      this._regexesCount = 0;
     }
     return this;
   }
@@ -284,7 +276,6 @@ export class PatternEmitter implements IPatternEmitter {
     const pattern: string = String(regex);
 
     const listeners = this._listeners.get(pattern);
-    
 
     return listeners ? listeners : new Array<PatternListener>();
   }
@@ -305,19 +296,15 @@ export class PatternEmitter implements IPatternEmitter {
    * @private
    */
   private getMatchingListeners(type: EventEmitterType) {
-    
     const matchingListeners = new Array<PatternListener>();
     if (typeof type === 'string') {
       this._regexMap.forEach((regexp: RegExp /* patternKey: string */) => {
         if (regexp && regexp instanceof RegExp) {
-          
-
           /**
            * Testing the type with the regexp
            */
           if (regexp.test(type)) {
             matchingListeners.push(...this.patternListeners(regexp));
-            
           }
         }
       });
@@ -327,7 +314,6 @@ export class PatternEmitter implements IPatternEmitter {
       matchingListeners.push(
         ...(this._emitterListeners(type) as PatternListener[])
       );
-      
     }
 
     /**
