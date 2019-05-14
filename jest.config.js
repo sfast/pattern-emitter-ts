@@ -1,9 +1,8 @@
 module.exports = {
-    "roots": [
-      "<rootDir>/test"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    collectCoverage: true,
-}
+  "roots": [
+    "<rootDir>/test"
+  ],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  collectCoverage: true,
+};

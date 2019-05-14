@@ -61,6 +61,7 @@ export class PatternEmitter implements IPatternEmitter {
     EventPattern,
     PatternListener[]
   >();
+  private _actualListeners = new Map<PatternListener, PatternListener>();
 
   // public addListener: PatternEmitterInterfaceFunction;
   // public removeListener: PatternEmitterInterfaceFunction;
@@ -75,6 +76,7 @@ export class PatternEmitter implements IPatternEmitter {
 
     this._regexesCount = 0;
     this._listeners = new Map<EventPattern, PatternListener[]>();
+    this._actualListeners = new Map<PatternListener, PatternListener>();
 
     this._regexMap = new Map<string, RegExp>();
 
@@ -108,7 +110,9 @@ export class PatternEmitter implements IPatternEmitter {
     const matchingListeners = this.getMatchingListeners(type);
 
     matchingListeners.forEach((listener: PatternListener) => {
-      listener.bind(this)(...rest); //?????????????
+      console.log(">>>>>>>>>>>", listener);
+      
+      listener.bind(this)(...rest); //????????????? no need to bind, why?
     });
 
     return matchingListeners.length > 0;
@@ -146,6 +150,8 @@ export class PatternEmitter implements IPatternEmitter {
    */
   public addListener(type: EventPattern, listener: PatternListener) {
     const wrapedListener = this.wrapListener(listener);
+    this._actualListeners.set(listener, wrapedListener);
+
     // ** the standard
     if (!(type instanceof RegExp)) {
       return this._addListener(type, listener);
@@ -187,11 +193,12 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {PatternEmitter | EventEmitter}
    */
   public removeListener(type: EventPattern, listener: PatternListener) {
+    const wrapedListener = this._actualListeners.get(listener);
     if (!(type instanceof RegExp)) {
       return this._removeListener(type, listener);
     }
 
-    const wrappedListener = this.wrapListener(listener);
+    // const wrappedListener = this.wrapListener(listener);
 
     const regex: RegExp = type;
     // AVAR::NOTE string representation of the regexp
@@ -202,7 +209,7 @@ export class PatternEmitter implements IPatternEmitter {
     if (matchingListenersArray instanceof Array) {
       const arrWithRemovedListener = matchingListenersArray.filter(
         (value, index, arr) => {
-          return value !== wrappedListener;
+          return value !== wrapedListener;
         }
       );
       this._listeners.set(pattern, arrWithRemovedListener);
@@ -248,6 +255,8 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {PatternListener[]}
    */
   public listeners(type: EventEmitterType): PatternListener[] {
+    console.log("getttttttt", this.getMatchingListeners);
+    
     return this.getMatchingListeners(type);
   }
 
@@ -311,17 +320,30 @@ export class PatternEmitter implements IPatternEmitter {
       // ** AVAR::NOTE adding the string and symbol listeners
       // @todo review the type transformation
 
-      matchingListeners.push(
-        ...(this._emitterListeners(type) as PatternListener[])
-      );
+      const getStrinListeners: any = [];
+      this._emitterListeners(type).forEach(elem => {
+        getStrinListeners.push(this._actualListeners.get(elem as PatternListener));
+      });
+
+      // matchingListeners.push(
+      //   ...(this._emitterListeners(type) as PatternListener[])
+      // );
+      matchingListeners.push(...(getStrinListeners as PatternListener[]));
     }
 
     /**
      * @todo maybe we should add index and sort listeners by index
      */
-    return matchingListeners.sort((a: any, b: any) => {
+    const matchingWrapedListeners = matchingListeners.sort((a: any, b: any) => {
       return a.idx - b.idx;
     });
+
+    const listenersWithoutIndexes = matchingListeners.map((elem) => {
+      return getByValue.bind(this)(this._actualListeners, elem)
+    })
+    // console.log("hereee", listenersWithoutIndexes[2]);
+    
+    return listenersWithoutIndexes;
   }
 
   private wrapListener(listener: PatternListener): PatternListener {
@@ -332,5 +354,13 @@ export class PatternEmitter implements IPatternEmitter {
     wrapedListener.idx = PatternEmitter._globalListenerIndex;
     PatternEmitter._globalListenerIndex++;
     return wrapedListener;
+  }
+}
+
+
+function getByValue(map: Map<PatternListener, PatternListener>, searchValue: any): any {
+  for (let [key, value] of map.entries()) {
+    if (value === searchValue)
+      return key;
   }
 }
