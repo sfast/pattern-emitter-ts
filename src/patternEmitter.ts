@@ -110,8 +110,6 @@ export class PatternEmitter implements IPatternEmitter {
     const matchingListeners = this.getMatchingListeners(type);
 
     matchingListeners.forEach((listener: PatternListener) => {
-      console.log(">>>>>>>>>>>", listener);
-      
       listener.bind(this)(...rest); //????????????? no need to bind, why?
     });
 
@@ -150,7 +148,8 @@ export class PatternEmitter implements IPatternEmitter {
    */
   public addListener(type: EventPattern, listener: PatternListener) {
     const wrapedListener = this.wrapListener(listener);
-    this._actualListeners.set(listener, wrapedListener);
+
+    this._actualListeners.set(wrapedListener, listener);
 
     // ** the standard
     if (!(type instanceof RegExp)) {
@@ -192,8 +191,10 @@ export class PatternEmitter implements IPatternEmitter {
    * @param {PatternListener} listener
    * @return {PatternEmitter | EventEmitter}
    */
+
+  //@todo
   public removeListener(type: EventPattern, listener: PatternListener) {
-    const wrapedListener = this._actualListeners.get(listener);
+    const wrapedListener = this._actualListeners.get(listener); //thisss
     if (!(type instanceof RegExp)) {
       return this._removeListener(type, listener);
     }
@@ -255,8 +256,6 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {PatternListener[]}
    */
   public listeners(type: EventEmitterType): PatternListener[] {
-    console.log("getttttttt", this.getMatchingListeners);
-    
     return this.getMatchingListeners(type);
   }
 
@@ -320,15 +319,19 @@ export class PatternEmitter implements IPatternEmitter {
       // ** AVAR::NOTE adding the string and symbol listeners
       // @todo review the type transformation
 
-      const getStrinListeners: any = [];
+      const getStringListeners: any = [];
+
       this._emitterListeners(type).forEach(elem => {
-        getStrinListeners.push(this._actualListeners.get(elem as PatternListener));
+        getStringListeners.push(
+          // this._actualListeners.get(elem as PatternListener)
+          getByValue.bind(this)(this._actualListeners, elem)
+        );
       });
 
       // matchingListeners.push(
       //   ...(this._emitterListeners(type) as PatternListener[])
       // );
-      matchingListeners.push(...(getStrinListeners as PatternListener[]));
+      matchingListeners.push(...(getStringListeners as PatternListener[]));
     }
 
     /**
@@ -337,13 +340,18 @@ export class PatternEmitter implements IPatternEmitter {
     const matchingWrapedListeners = matchingListeners.sort((a: any, b: any) => {
       return a.idx - b.idx;
     });
+    let listenersWithoutIndexes: any = [];
+    listenersWithoutIndexes = matchingWrapedListeners.map(elem => {
+      // console.log(
+      //   '000000000000',
+      //   getByValue.bind(this)(this._actualListeners, elem)
+      // );
 
-    const listenersWithoutIndexes = matchingListeners.map((elem) => {
-      return getByValue.bind(this)(this._actualListeners, elem)
-    })
-    // console.log("hereee", listenersWithoutIndexes[2]);
-    
+      return this._actualListeners.get(elem);
+    });
+
     return listenersWithoutIndexes;
+    // return matchingWrapedListeners;
   }
 
   private wrapListener(listener: PatternListener): PatternListener {
@@ -357,10 +365,13 @@ export class PatternEmitter implements IPatternEmitter {
   }
 }
 
-
-function getByValue(map: Map<PatternListener, PatternListener>, searchValue: any): any {
-  for (let [key, value] of map.entries()) {
-    if (value === searchValue)
+function getByValue(
+  map: Map<PatternListener, PatternListener>,
+  searchValue: any
+): any {
+  for (const [key, value] of map.entries()) {
+    if (value === searchValue) {
       return key;
+    }
   }
 }

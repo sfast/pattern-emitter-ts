@@ -11,7 +11,7 @@ export type EventPattern = RegExp | EventEmitterType;
 /**
  * This is like the native declaration of emitter listener function
  */
-export type PatternListener = (...args: any[]) => void;
+export type PatternListener = (...args: any[]) => void | undefined;
 
 export type EventInterfaceFunction = (
   event: string | symbol,

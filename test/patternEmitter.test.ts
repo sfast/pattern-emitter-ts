@@ -1,5 +1,6 @@
 import { PatternEmitter } from '../src';
 import { expect } from 'chai';
+import { toASCII } from 'punycode';
 
 describe('PatternEmitter', () => {
   let emitter: PatternEmitter;
@@ -68,289 +69,323 @@ describe('PatternEmitter', () => {
       expect(allArgs).to.eql(['arg1', 'arg2', 'arg3']);
     });
 
-    // it('invokes all matching listeners', () => {
-    //   let x = 0;
-    //   let y = 0;
-    //   let z = 0;
+    it('invokes all matching listeners', () => {
+      let x = 0;
+      let y = 0;
+      let z = 0;
 
-    //   const listener1 = () => {
-    //     x++;
-    //   };
+      const listener1 = () => {
+        x++;
+      };
 
-    //   const listener2 = () => {
-    //     y++;
-    //   };
+      const listener2 = () => {
+        y++;
+      };
 
-    //   const listener3 = () => {
-    //     z++;
-    //   };
+      const listener3 = () => {
+        z++;
+      };
 
-    //   emitter.on(/t.*/, listener1);
+      emitter.on(/t.*/, listener1);
 
-    //   emitter.on(/.*/, listener1);
-    //   emitter.on(/.*/, listener2);
-    //   emitter.on(/.*/, listener3);
+      emitter.on(/.*/, listener1);
+      emitter.on(/.*/, listener2);
+      emitter.on(/.*/, listener3);
 
-    //   emitter.on('test', listener3);
+      emitter.on('test', listener3);
 
-    //   emitter.emit('test');
+      emitter.emit('test');
 
-    //   expect(x).to.equal(2);
-    //   expect(y).to.equal(1);
-    //   expect(z).to.equal(2);
-    // });
+      expect(x).to.equal(2);
+      expect(y).to.equal(1);
+      expect(z).to.equal(2);
+    });
 
-  //   it('emit can be called multiple times', () => {
-  //     let counter = 0;
-  //     emitter.on(/[t]/, () => {
-  //       counter++;
-  //     });
+    it('emit can be called multiple times', () => {
+      let counter = 0;
+      emitter.on(/[t]/, () => {
+        counter++;
+      });
 
-  //     emitter.emit('test1');
-  //     expect(counter).to.equal(1);
+      emitter.emit('test1');
+      expect(counter).to.equal(1);
 
-  //     emitter.emit('test2');
-  //     expect(counter).to.equal(2);
-  //   });
-  // });
+      emitter.emit('test2');
+      expect(counter).to.equal(2);
+    });
+  });
 
-  // describe('once', () => {
-  //   it('adds a listener that can be invoked at most once for regexp', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
+  describe('once', () => {
+    it('adds a listener that can be invoked at most once for regexp', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
 
-  //     emitter.once(/[a-z]/, listener);
-  //     emitter.emit('test');
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(1);
-  //   });
+      emitter.once(/[a-z]/, listener);
+      emitter.emit('test');
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+    });
 
-  //   it('adds a listener that can be invoked at most once for string', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
+    it('adds a listener that can be invoked at most once for string', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
 
-  //     emitter.once('test', listener);
-  //     emitter.emit('test');
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(1);
-  //   });
-  // });
+      emitter.once('test', listener);
+      emitter.emit('test');
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+    });
+  });
 
-  // describe('addListener', () => {
-  //   it('adds listener if type is RegExp', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
-  //     emitter.addListener(/^t.*/, listener);
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(1);
-  //   });
+  describe('addListener', () => {
+    it('adds listener if type is RegExp', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
+      emitter.addListener(/^t.*/, listener);
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+    });
 
-  //   it('adds listener if type is string', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
-  //     emitter.addListener('test', listener);
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(1);
-  //   });
+    it('adds listener if type is string', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
+      emitter.addListener('test', listener);
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+    });
 
-  //   it('can add multiple listeners for the same pattern', () => {
-  //     let counter = 0;
-  //     const listener1 = () => {
-  //       counter++;
-  //     };
-  //     const listener2 = () => {
-  //       counter++;
-  //     };
+    it('can add multiple listeners for the same pattern', () => {
+      let counter = 0;
+      const listener1 = () => {
+        counter++;
+      };
+      const listener2 = () => {
+        counter++;
+      };
 
-  //     emitter.addListener('test', listener1);
-  //     emitter.addListener('test', listener2);
+      emitter.addListener('test', listener1);
+      emitter.addListener('test', listener2);
 
-  //     emitter.addListener(/^t.*/, listener1);
+      emitter.addListener(/^t.*/, listener1);
 
-  //     emitter.emit('test');
-  //     expect(emitter.listenerCount('test')).to.equal(3);
-  //     expect(counter).to.equal(3);
-  //   });
+      emitter.emit('test');
+      expect(emitter.listenerCount('test')).to.equal(3);
+      expect(counter).to.equal(3);
+    });
 
-  //   it('can add same listeners for the same pattern', () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
+    it('can add same listeners for the same pattern', () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
 
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener('test', listener);
+      emitter.addListener('test', listener);
+      emitter.addListener('test', listener);
 
-  //     emitter.emit('test');
-  //     expect(emitter.listenerCount('test')).to.equal(2);
-  //     expect(counter).to.equal(2);
-  //   });
-  // });
+      emitter.emit('test');
+      expect(emitter.listenerCount('test')).to.equal(2);
+      expect(counter).to.equal(2);
+    });
+  });
 
-  // describe('on', () => {
-  //   it('is an alias for addListener', () => {
-  //     expect(emitter.on).to.equal(emitter.addListener);
-  //   });
-  // });
+  describe('on', () => {
+    it('is an alias for addListener', () => {
+      expect(emitter.on).to.equal(emitter.addListener);
+    });
+  });
 
-  // describe('off', () => {
-  //   it('is an alias for removeListener', () => {
-  //     expect(emitter.off).to.equal(emitter.removeListener);
-  //   });
-  // });
+  describe('off', () => {
+    it('is an alias for removeListener', () => {
+      expect(emitter.off).to.equal(emitter.removeListener);
+    });
+  });
 
-  // describe('removeListener', () => {
-  //   it("removes listener from _listeners map's appropriate pattern's array if the given type is RegExp", () => {
-  //     let counter = 0;
-  //     const listener = () => {
-  //       counter++;
-  //     };
-  //     emitter.addListener(/^t.*/, listener);
-  //     emitter.emit('test');
-  //     expect(counter).to.equal(1);
-  //     emitter.removeListener(/^t.*/, listener);
-  //     emitter.emit('test');
+  describe('removeListener', () => {
+    it("removes listener from _listeners map's appropriate pattern's array if the given type is RegExp", () => {
+      let counter = 0;
+      const listener = () => {
+        counter++;
+      };
+      emitter.addListener(/^t.*/, listener);
+      emitter.emit('test');
+      expect(counter).to.equal(1);
+      emitter.removeListener(/^t.*/, listener);
+      emitter.emit('test');
 
-  //     expect(counter).to.equal(1);
-  //   });
+      expect(counter).to.equal(1);
+    });
 
-  //   it("removes listener from _listeners map's appropriate pattern's array if the given type is String", () => {
-  //     const listener = () => {};
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener('test', () => {});
+    it("removes listener from _listeners map's appropriate pattern's array if the given type is String", () => {
+      const listener = () => {};
+      emitter.addListener('test', listener);
+      emitter.addListener('test', () => {});
 
-  //     emitter.emit('test');
-  //     emitter.removeListener('test', listener);
+      emitter.emit('test');
+      emitter.removeListener('test', listener);
 
-  //     expect(emitter.listenerCount('test')).to.equal(1);
-  //   });
-  // });
+      expect(emitter.listenerCount('test')).to.equal(1);
+    });
+  });
 
-  // describe('removeAllListeners', () => {
-  //   it('removes all listeners if type not given', () => {
-  //     const listener = () => {};
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener(/test/, listener);
+  describe('removeAllListeners', () => {
+    it('removes all listeners if type not given', () => {
+      const listener = () => {};
+      emitter.addListener('test', listener);
+      emitter.addListener('test', listener);
+      emitter.addListener(/test/, listener);
 
-  //     emitter.emit('test');
-  //     expect(emitter.listenerCount('test')).to.equal(3);
+      emitter.emit('test');
+      expect(emitter.listenerCount('test')).to.equal(3);
 
-  //     emitter.removeAllListeners();
+      emitter.removeAllListeners();
 
-  //     expect(emitter.emit('test')).to.equal(false);
-  //     expect(emitter.listenerCount('test')).to.equal(0);
-  //   });
+      expect(emitter.emit('test')).to.equal(false);
+      expect(emitter.listenerCount('test')).to.equal(0);
+    });
 
-  //   it('removes all listeners of given type for string', () => {
-  //     const listener = () => {};
-  //     emitter.addListener('test', listener);
-  //     emitter.addListener('test', () => {});
+    it('removes all listeners of given type for string', () => {
+      const listener = () => {};
+      emitter.addListener('test', listener);
+      emitter.addListener('test', () => {});
 
-  //     emitter.emit('test');
-  //     emitter.removeAllListeners('test');
+      emitter.emit('test');
+      emitter.removeAllListeners('test');
 
-  //     expect(emitter.listenerCount('test')).to.equal(0);
-  //   });
+      expect(emitter.listenerCount('test')).to.equal(0);
+    });
 
-  //   it('removes all listeners of given type for regexp', () => {
-  //     const listener = () => {};
-  //     emitter.addListener(/test/, listener);
-  //     emitter.addListener(/test/, () => {});
+    it('removes all listeners of given type for regexp', () => {
+      const listener = () => {};
+      emitter.addListener(/test/, listener);
+      emitter.addListener(/test/, () => {});
 
-  //     emitter.emit('test');
-  //     emitter.removeAllListeners(/test/);
+      emitter.emit('test');
+      emitter.removeAllListeners(/test/);
 
-  //     expect(emitter.emit('test')).to.equal(false);
-  //   });
-  // });
+      expect(emitter.emit('test')).to.equal(false);
+    });
+  });
 
-  //@todo
   describe('listeners', () => {
-    it('returns array of all listeners for the given pattern', () => {
-      PatternEmitter._globalListenerIndex = 0;
+    it('returns array of all listeners for the given pattern if the regexps are different, but the functions the same', () => {
       const listener1 = () => {};
       const listener2 = () => {};
 
       emitter.on(/^t.*/, listener2);
       emitter.on(/^.*/, listener1);
-      emitter.on(/^.*/, listener1);
-      emitter.on('test', listener1);
       emitter.emit('test');
-      // console.log('listeners>>>>>>', emitter.listeners('test'));
-      expect(emitter.listeners('test')).to.have.same.members([listener2, listener1, listener1, listener1]);
+      expect(emitter.listeners('test')).deep.equal([listener2, listener1]);
+    });
+
+    it('returns array of all listeners for the given pattern if regexps are the same', () => {
+      const listener1 = () => {};
+      const listener2 = () => {};
+      const listener3 = () => {};
+
+      emitter.on(/^t.*/, listener2);
+      emitter.on(/^.*/, listener1);
+      emitter.on(/^.*/, listener3);
+      emitter.emit('test');
+      expect(emitter.listeners('test')).deep.equal([
+        listener2,
+        listener1,
+        listener3,
+      ]);
+    });
+
+    it('returns array of all listeners for the given pattern if regexps and functions are the same', () => {
+      let counter = 0;
+      const listener1 = () => {
+        counter++;
+      };
+      const listener2 = () => {};
+
+      emitter.on(/^t.*/, listener2);
+      emitter.on(/^.*/, listener1);
+      emitter.on(/^.*/, listener1);
+
+      // emitter.on('test', listener1);
+
+      emitter.emit('test');
+
+      expect(emitter.listeners('test')).deep.equal([
+        listener2,
+        listener1,
+        listener1,
+      ]);
+      expect(counter).to.eql(2);
     });
   });
 
-  // describe('listenerCount', () => {
-  //   it('returns the count of listeners for given pattern', () => {
-  //     emitter.addListener('test', () => {});
-  //     emitter.addListener('test', () => {});
-  //     emitter.addListener(/test/, () => {});
+  describe('listenerCount', () => {
+    it('returns the count of listeners for given pattern', () => {
+      emitter.addListener('test', () => {});
+      emitter.addListener('test', () => {});
+      emitter.addListener(/test/, () => {});
 
-  //     const result = emitter.listenerCount('test');
+      const result = emitter.listenerCount('test');
 
-  //     expect(result).to.equal(3);
-  //   });
-  // });
+      expect(result).to.equal(3);
+    });
+  });
 
-  // describe('order', () => {
-  //   it('calls matching listeners with order and listeners get data for regexps', () => {
-  //     const arrOfDatas: any = [];
+  describe('order', () => {
+    it('calls matching listeners with order and listeners get data for regexps', () => {
+      const arrOfDatas: any = [];
 
-  //     emitter.on(/^t.*/, (data: any) => {
-  //       arrOfDatas.push(`${data}:1`);
-  //     });
-  //     emitter.on(/^t\w{3}/, (data: any) => {
-  //       arrOfDatas.push(`${data}:2`);
-  //     });
+      emitter.on(/^t.*/, (data: any) => {
+        arrOfDatas.push(`${data}:1`);
+      });
+      emitter.on(/^t\w{3}/, (data: any) => {
+        arrOfDatas.push(`${data}:2`);
+      });
 
-  //     emitter.emit('test', 'data');
-  //     expect(arrOfDatas).to.eql(['data:1', 'data:2']);
-  //   });
+      emitter.emit('test', 'data');
+      expect(arrOfDatas).to.eql(['data:1', 'data:2']);
+    });
 
-  //   it('calls matching listeners with order and listeners get data for strings', () => {
-  //     const arrOfDatas: any = [];
+    it('calls matching listeners with order and listeners get data for strings', () => {
+      const arrOfDatas: any = [];
 
-  //     emitter.on('test', (data: any) => {
-  //       arrOfDatas.push(`${data}:1`);
-  //     });
-  //     emitter.on('test', (data: any) => {
-  //       arrOfDatas.push(`${data}:2`);
-  //     });
+      emitter.on('test', (data: any) => {
+        arrOfDatas.push(`${data}:1`);
+      });
+      emitter.on('test', (data: any) => {
+        arrOfDatas.push(`${data}:2`);
+      });
 
-  //     emitter.emit('test', 'data');
-  //     expect(arrOfDatas).to.eql(['data:1', 'data:2']);
-  //   });
+      emitter.emit('test', 'data');
+      expect(arrOfDatas).to.eql(['data:1', 'data:2']);
+    });
 
-  //   it('calls matching listeners with order and listeners get data for strings and regexps', () => {
-  //     const arrOfDatas: any = [];
+    it('calls matching listeners with order and listeners get data for strings and regexps', () => {
+      const arrOfDatas: any = [];
 
-  //     emitter.on('test', (data: any) => {
-  //       arrOfDatas.push(`${data}:0`);
-  //     });
-  //     emitter.on(/^t.*/, (data: any) => {
-  //       arrOfDatas.push(`${data}:1`);
-  //     });
-  //     emitter.on('test', (data: any) => {
-  //       arrOfDatas.push(`${data}:2`);
-  //     });
+      emitter.on('test', (data: any) => {
+        arrOfDatas.push(`${data}:0`);
+      });
+      emitter.on(/^t.*/, (data: any) => {
+        arrOfDatas.push(`${data}:1`);
+      });
+      emitter.on('test', (data: any) => {
+        arrOfDatas.push(`${data}:2`);
+      });
 
-  //     emitter.on(/^t\w{3}/, (data: any) => {
-  //       arrOfDatas.push(`${data}:3`);
-  //     });
+      emitter.on(/^t\w{3}/, (data: any) => {
+        arrOfDatas.push(`${data}:3`);
+      });
 
-  //     emitter.emit('test', 'data');
+      emitter.emit('test', 'data');
 
-  //     expect(arrOfDatas).to.eql(['data:0', 'data:1', 'data:2', 'data:3']); 
-  //   });
+      expect(arrOfDatas).to.eql(['data:0', 'data:1', 'data:2', 'data:3']);
+    });
   });
 });
