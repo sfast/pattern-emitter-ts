@@ -14,6 +14,8 @@ import {
   PatternEmitterInterfaceFunction,
 } from './types';
 
+import { getByValue } from './utils';
+
 /**
  * Creates a new PatternEmitter, which composites EventEmitter. In addition to
  * EventEmitter's prototype, it allows listeners to register to events matching
@@ -323,14 +325,10 @@ export class PatternEmitter implements IPatternEmitter {
 
       this._emitterListeners(type).forEach(elem => {
         getStringListeners.push(
-          // this._actualListeners.get(elem as PatternListener)
           getByValue.bind(this)(this._actualListeners, elem)
         );
       });
 
-      // matchingListeners.push(
-      //   ...(this._emitterListeners(type) as PatternListener[])
-      // );
       matchingListeners.push(...(getStringListeners as PatternListener[]));
     }
 
@@ -340,18 +338,12 @@ export class PatternEmitter implements IPatternEmitter {
     const matchingWrapedListeners = matchingListeners.sort((a: any, b: any) => {
       return a.idx - b.idx;
     });
-    let listenersWithoutIndexes: any = [];
-    listenersWithoutIndexes = matchingWrapedListeners.map(elem => {
-      // console.log(
-      //   '000000000000',
-      //   getByValue.bind(this)(this._actualListeners, elem)
-      // );
 
+    const listenersWithoutIndexes: any = matchingWrapedListeners.map(elem => {
       return this._actualListeners.get(elem);
     });
 
     return listenersWithoutIndexes;
-    // return matchingWrapedListeners;
   }
 
   private wrapListener(listener: PatternListener): PatternListener {
@@ -362,16 +354,5 @@ export class PatternEmitter implements IPatternEmitter {
     wrapedListener.idx = PatternEmitter._globalListenerIndex;
     PatternEmitter._globalListenerIndex++;
     return wrapedListener;
-  }
-}
-
-function getByValue(
-  map: Map<PatternListener, PatternListener>,
-  searchValue: any
-): any {
-  for (const [key, value] of map.entries()) {
-    if (value === searchValue) {
-      return key;
-    }
   }
 }
