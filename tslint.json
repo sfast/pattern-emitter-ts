@@ -10,6 +10,7 @@
     "no-inferrable-types": false,
     "member-access": true,
     "no-any": false,
-    "interface-name": false
+    "interface-name": false,
+    "indent": [true, "spaces", 4]
   }
 }

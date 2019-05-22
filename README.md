@@ -4,7 +4,7 @@
 Run the ```npm run doc``` command to generate a Typedoc under ```tsdoc``` folder.
 
 ### Test
-Run the script ```npm run test```
+Run the tests with a simple ```npm run test```  or  simply ```npm t```.
 
 ### Type coverage
 
@@ -19,7 +19,8 @@ typewiz coverage tsconfig.json
 
 
 
-### Examples
+### Examplesnpm run test:coverage
+
 ```typescript
 
 import { PatternEmitter } from "pattern-emitter-ts";

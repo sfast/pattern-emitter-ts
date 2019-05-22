@@ -5,3 +5,7 @@ build/
 .idea/
 
 tsdoc/
+
+typings/
+
+coverage/
