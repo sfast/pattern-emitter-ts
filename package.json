@@ -7,13 +7,14 @@
   "files": [
     "build/src"
   ],
-  "license": "Apache-2.0",
+  "license": "Steadfast tech",
   "keywords": [],
   "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.json",
     "test": "jest --detectOpenHandles --forceExit",
+    "docs": "typedoc --mode file --out docs --readme README.md --module commonjs",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
