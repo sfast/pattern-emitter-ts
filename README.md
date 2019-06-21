@@ -11,7 +11,6 @@ EventEmitter. Written in TypeScript
 * [Test](#test)
 * [Example](#example)
 * [Contributing](#contributing)
-* [Have a question?](#askmongoManager)
 * [License](#license)
 
 
@@ -53,11 +52,12 @@ Run the tests with a simple ```npm run test```  or  simply ```npm t```.
 ### Type coverage
 
 ```
+npm i typewiz -g
 typewiz coverage tsconfig.json
 
-// ** April 30 2019 check
-// 347 of 357 types are known.
-// Your type coverage is: 97.20%
+// ** Jun 22 2019 
+876 of 947 types are known.
+Your type coverage is: 92.50%
 
 ```
 
@@ -67,44 +67,36 @@ typewiz coverage tsconfig.json
 
 ```typescript
 
-import { PatternEmitter } from ""@sfast/pattern-emitter"";
+import { PatternEmitter } from "@sfast/pattern-emitter";
 
 const pe = new PatternEmitter();
-
 
 pe.on("hi::1", (data) => {
     console.log(`Hi::1 ${data}`);
 });
 
 pe.on("hi::2", (data) => {
-    console.log(`Hi::2 ${data}`);
+    console.log(`Hi::2 ${data}`); // this will log
 });
 
 
 pe.on(/^hi/, (data) => {
-    console.log(`Hi::(regexp) ${data}`);
+    console.log(`Hi::(regexp) ${data}`);  // this will log
 });
 
 
-pe.emit("hi::2", "data");
+pe.emit("hi::2", "data"); 
 
 
 ```
 
-
-
-## Still have a question ?
-We'll be happy to answer your questions. Try to reach out us on mongoManager gitter chat [<img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg">](https://gitter.im/npm-patternemitter/Lobby) <br/>
-
-
-
 ## Contributing
-Contributions are always welcome! <br/>
-Please read the [contribution guidelines](https://github.com/sfast/patternemitter/blob/master/CONTRIBUTING.md) first.
+Contributions are always welcome!
 
 
 ### Contributors
 * [Artak Vardanyan](https://github.com/artakvg)
+* [Armine Gevorgyan](https://github.com/mineyan)
 
 ## License
 [MIT](https://github.com/sfast/patternemitter/blob/master/LICENSE)
