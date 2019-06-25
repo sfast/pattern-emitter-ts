@@ -18,7 +18,7 @@
     "emitter"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc --downlevelIteration  -p tsconfig.json",
     "test": "jest --detectOpenHandles --forceExit",
     "docs": "typedoc --mode file --out docs --readme README.md --module commonjs",
     "check": "gts check",
