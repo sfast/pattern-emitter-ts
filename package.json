@@ -10,6 +10,10 @@
   "license": "MIT",
   "author": "steadfast.tech",
   "homepage": "https://steadfast.tech",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sfast/pattern-emitter-ts.git"
+  },
   "keywords": [
     "event emitter",
     "regexp emitter",
