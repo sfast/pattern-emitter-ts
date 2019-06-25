@@ -2,7 +2,6 @@
 Event emitters with support for regular expressions. Inherits from Node's
 EventEmitter. Written in TypeScript
 
-- [@sfast/pattern-emitter-ts](#sfastpattern-emitter-ts)
   - [Installation](#Installation)
   - [Overview](#Overview)
   - [API](#API)
@@ -19,7 +18,7 @@ EventEmitter. Written in TypeScript
 You can install it with 
 
 ```bash
-    npm i @sfast/patternemitter
+    npm i @sfast/pattern-emitter-ts
 ```
 
 ## Overview
