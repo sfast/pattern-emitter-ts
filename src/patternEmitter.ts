@@ -84,6 +84,10 @@ export class PatternEmitter implements IPatternEmitter {
     this.off = this.removeListener;
   }
 
+  public get listeners(){
+    return this._listeners;
+  }
+
   /**
    * Emits an event to all listeners for the specified type. In addition, if type
    * is a string, emits the event to all listeners whose patterns match. Returns
@@ -238,7 +242,7 @@ export class PatternEmitter implements IPatternEmitter {
    * @param {RegExp} regex
    * @return {PatternListener[]}
    */
-  public listeners(type: EventEmitterType): PatternListener[] {
+  public listenersByEventType(type: EventEmitterType): PatternListener[] {
     return this.getMatchingListeners(type);
   }
 

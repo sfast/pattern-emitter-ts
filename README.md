@@ -21,7 +21,6 @@ You can install it with
 
 ```bash
     npm i @sfast/patternemitter
-
 ```
 
 ## Overview
@@ -58,7 +57,6 @@ typewiz coverage tsconfig.json
 // ** April 30 2019 check
 // 347 of 357 types are known.
 // Your type coverage is: 97.20%
-
 ```
 
 
@@ -87,7 +85,6 @@ pe.on(/^hi/, (data) => {
 
 
 pe.emit("hi::2", "data");
-
 
 ```
 

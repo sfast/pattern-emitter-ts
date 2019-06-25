@@ -1,6 +1,5 @@
 import { PatternEmitter } from "../src";
 import { expect } from "chai";
-import { toASCII } from "punycode";
 
 describe("PatternEmitter", () => {
   let emitter: PatternEmitter;
@@ -274,7 +273,7 @@ describe("PatternEmitter", () => {
     });
   });
 
-  describe("listeners", () => {
+  describe("listenersByEventType", () => {
     it("returns array of all listeners for the given pattern if the regexps are different, but the functions the same", () => {
       const listener1 = () => {};
       const listener2 = () => {};
@@ -282,7 +281,7 @@ describe("PatternEmitter", () => {
       emitter.on(/^t.*/, listener2);
       emitter.on(/^.*/, listener1);
       emitter.emit("test");
-      expect(emitter.listeners("test")).deep.equal([listener2, listener1]);
+      expect(emitter.listenersByEventType("test")).deep.equal([listener2, listener1]);
     });
 
     it("returns array of all listeners for the given pattern if regexps are the same", () => {
@@ -294,7 +293,7 @@ describe("PatternEmitter", () => {
       emitter.on(/^.*/, listener1);
       emitter.on(/^.*/, listener3);
       emitter.emit("test");
-      expect(emitter.listeners("test")).deep.equal([
+      expect(emitter.listenersByEventType("test")).deep.equal([
         listener2,
         listener1,
         listener3,
@@ -316,7 +315,7 @@ describe("PatternEmitter", () => {
 
       emitter.emit("test");
 
-      expect(emitter.listeners("test")).deep.equal([
+      expect(emitter.listenersByEventType("test")).deep.equal([
         listener2,
         listener1,
         listener1,
