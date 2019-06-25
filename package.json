@@ -1,6 +1,6 @@
 {
   "name": "@sfast/pattern-emitter-ts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Pattern emitter Typescript implementation",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,7 +9,8 @@
   ],
   "license": "MIT",
   "author": "steadfast.tech",
-  "keywords": [],
+  "homepage": "https://steadfast.tech",
+  "keywords": ["event emitter", "regexp emitter", "pattern", "emitter"],
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "test": "jest --detectOpenHandles --forceExit",

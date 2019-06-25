@@ -1,17 +1,20 @@
-pattern-emitter
+@sfast/pattern-emitter-ts
 ===============
 
 
 Event emitters with support for regular expressions. Inherits from Node's
 EventEmitter. Written in TypeScript
 
-* [Installation](#installation)
-* [Overview](#overview)
-* [API](#api)
-* [Test](#test)
-* [Example](#example)
-* [Contributing](#contributing)
-* [License](#license)
+- [@sfast/pattern-emitter-ts](#sfastpattern-emitter-ts)
+  - [Installation](#Installation)
+  - [Overview](#Overview)
+  - [API](#API)
+  - [Test](#Test)
+    - [Type coverage](#Type-coverage)
+  - [Example](#Example)
+  - [Contributing](#Contributing)
+    - [Contributors](#Contributors)
+  - [License](#License)
 
 
 ## Installation
@@ -19,7 +22,7 @@ EventEmitter. Written in TypeScript
 You can install it with 
 
 ```bash
-    npm i @sfast/patternemitter
+    npm i @sfast/pattern-emitter-ts
 
 ```
 
@@ -40,7 +43,7 @@ import { EventEmitter } from "events"
 with:
 
 ``` javascript
-import { PatternEmitter } from "@sfast/pattern-emitter";
+import { PatternEmitter } from "@sfast/pattern-emitter-ts";
 ```
 
 ## API
@@ -67,7 +70,7 @@ Your type coverage is: 92.50%
 
 ```typescript
 
-import { PatternEmitter } from "@sfast/pattern-emitter";
+import { PatternEmitter } from "@sfast/pattern-emitter-ts";
 
 const pe = new PatternEmitter();
 
