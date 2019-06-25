@@ -1,0 +1,12 @@
+node_modules
+src/
+
+.idea/
+
+.history/
+
+docs/
+
+coverage/
+
+*.DS_Store
