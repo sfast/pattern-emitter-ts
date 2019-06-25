@@ -84,7 +84,7 @@ export class PatternEmitter implements IPatternEmitter {
     this.off = this.removeListener;
   }
 
-  public get listeners(){
+  public get listeners() {
     return this._listeners;
   }
 

@@ -281,7 +281,10 @@ describe("PatternEmitter", () => {
       emitter.on(/^t.*/, listener2);
       emitter.on(/^.*/, listener1);
       emitter.emit("test");
-      expect(emitter.listenersByEventType("test")).deep.equal([listener2, listener1]);
+      expect(emitter.listenersByEventType("test")).deep.equal([
+        listener2,
+        listener1,
+      ]);
     });
 
     it("returns array of all listeners for the given pattern if regexps are the same", () => {

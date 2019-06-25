@@ -15,7 +15,7 @@ import {
 
 export interface IPatternEmitter {
   readonly listeners: Map<EventPattern, PatternListener[]>;
-  
+
   addListener: PatternEmitterInterfaceFunction;
   removeListener: PatternEmitterInterfaceFunction;
   on: PatternEmitterInterfaceFunction;
