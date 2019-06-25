@@ -22,8 +22,7 @@ EventEmitter. Written in TypeScript
 You can install it with 
 
 ```bash
-    npm i @sfast/pattern-emitter-ts
-
+    npm i @sfast/patternemitter
 ```
 
 ## Overview
@@ -89,7 +88,6 @@ pe.on(/^hi/, (data) => {
 
 
 pe.emit("hi::2", "data"); 
-
 
 ```
 

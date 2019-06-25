@@ -14,6 +14,8 @@ import {
 } from "./types";
 
 export interface IPatternEmitter {
+  readonly listeners: Map<EventPattern, PatternListener[]>;
+  
   addListener: PatternEmitterInterfaceFunction;
   removeListener: PatternEmitterInterfaceFunction;
   on: PatternEmitterInterfaceFunction;
@@ -27,7 +29,7 @@ export interface IPatternEmitter {
 
   // @todo setMaxListeners(n: number): PatternEmitter | EventEmitter;
   // getMaxListeners(): number;
-  listeners(event: EventEmitterType): PatternListener[];
+  listenersByEventType(event: EventEmitterType): PatternListener[];
   // @todo rawListeners(event: EventEmitterType): Function[];
   emit(event: EventEmitterType, ...args: any[]): boolean;
 
