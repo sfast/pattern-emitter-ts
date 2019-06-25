@@ -10,3 +10,7 @@ docs/
 coverage/
 
 *.DS_Store
+
+.gitignore
+
+.npmignore
