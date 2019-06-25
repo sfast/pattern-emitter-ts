@@ -1,6 +1,3 @@
-@sfast/pattern-emitter-ts
-===============
-
 
 Event emitters with support for regular expressions. Inherits from Node's
 EventEmitter. Written in TypeScript
