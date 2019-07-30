@@ -6,6 +6,7 @@
     "typeRoots": ["./node_modules/@types"],
     "sourceMap": true,
     "target": "es5",
+    "downlevelIteration": true
   },
   "include": [
     "src/**/*.ts",

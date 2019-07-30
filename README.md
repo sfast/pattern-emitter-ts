@@ -6,20 +6,21 @@ EventEmitter. Written in TypeScript
   - [Overview](#Overview)
   - [API](#API)
   - [Test](#Test)
-    - [Type coverage](#Type-coverage)
   - [Example](#Example)
-  - [Contributing](#Contributing)
-    - [Contributors](#Contributors)
+  - [Contributors](#Contributors)
   - [License](#License)
 
+<a name="Installation"></a>
 
 ## Installation
 
 You can install it with 
 
 ```bash
-    npm i @sfast/pattern-emitter-ts
+  npm i @sfast/pattern-emitter-ts
 ```
+
+<a name="Overview"></a>
 
 ## Overview
 
@@ -41,24 +42,32 @@ with:
 import { PatternEmitter } from "@sfast/pattern-emitter-ts";
 ```
 
+<a name="API"></a>
+
 ## API
 Run the ```npm run docs``` command to generate a Typedoc under ```docs``` folder.
 
-## Test
-Run the tests with a simple ```npm run test```  or  simply ```npm t```.
+<a name="Test"></a>
 
-### Type coverage
+
+## Test
+Run the tests with a simple ```npm run test```  or  simply ```npm t```. 
+Currently test coverage is 98%
+
+Type coverage
 
 ```
 npm i typewiz -g
 typewiz coverage tsconfig.json
 
 // ** Jun 22 2019 
-876 of 947 types are known.
-Your type coverage is: 92.50%
+881 of 952 types are known.
+Your type coverage is: 92.54%
 
 ```
 
+
+<a name="Example"></a>
 
 
 ## Example
@@ -87,9 +96,7 @@ pe.emit("hi::2", "data");
 
 ```
 
-## Contributing
-Contributions are always welcome!
-
+<a name="Contributors"></a>
 
 ### Contributors
 * [Artak Vardanyan](https://github.com/artakvg)
