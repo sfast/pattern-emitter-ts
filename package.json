@@ -6,7 +6,7 @@
   "types": "dist/src/index.d.ts",
   "license": "MIT",
   "author": "steadfast.tech",
-  "homepage": "https://steadfast.tech",
+  "homepage": "https://pattern-emitter-ts.steadfast.tech",
   "repository": {
     "type": "git",
     "url": "git://github.com/sfast/pattern-emitter-ts.git"
@@ -18,7 +18,7 @@
     "emitter"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc --downlevelIteration  -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
     "test": "jest --detectOpenHandles --forceExit",
     "docs": "typedoc --mode file --out docs --readme README.md --module commonjs",
     "check": "gts check",
@@ -31,17 +31,17 @@
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/events": "^3.0.0",
-    "@types/jest": "^24.0.12",
-    "@types/node": "^12.0.0",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.6.8",
     "chai": "^4.2.0",
     "gts": "^1.0.0",
     "jest": "^24.8.0",
     "source-map-support": "^0.5.12",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.1.0",
-    "typedoc": "^0.14.2",
+    "ts-node": "^8.3.0",
+    "typedoc": "^0.15.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
-    "typescript": "~3.4.5",
+    "typescript": "~3.5.3",
     "typewiz": "^1.2.4",
     "typewiz-core": "^1.2.4"
   },
