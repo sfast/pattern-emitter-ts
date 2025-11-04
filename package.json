@@ -1,6 +1,6 @@
 {
   "name": "@sfast/pattern-emitter-ts",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Pattern emitter Typescript implementation",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
