@@ -6,10 +6,13 @@
   "types": "dist/src/index.d.ts",
   "license": "MIT",
   "author": "steadfast.tech",
-  "homepage": "https://pattern-emitter-ts.steadfast.tech",
+  "homepage": "https://github.com/sfast/pattern-emitter-ts#readme",
   "repository": {
     "type": "git",
-    "url": "git://github.com/sfast/pattern-emitter-ts.git"
+    "url": "git+https://github.com/sfast/pattern-emitter-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sfast/pattern-emitter-ts/issues"
   },
   "keywords": [
     "event emitter",
