@@ -27,8 +27,8 @@ export interface IPatternEmitter {
   removeAllListeners(type?: EventPattern): PatternEmitter | EventEmitter;
   listenerCount(type: EventPattern): number;
 
-  // @todo setMaxListeners(n: number): PatternEmitter | EventEmitter;
-  // getMaxListeners(): number;
+  setMaxListeners(n: number): PatternEmitter | EventEmitter;
+  getMaxListeners(): number;
   listenersByEventType(event: EventEmitterType): PatternListener[];
   // @todo rawListeners(event: EventEmitterType): Function[];
   emit(event: EventEmitterType, ...args: any[]): boolean;

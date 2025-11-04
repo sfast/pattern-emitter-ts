@@ -98,6 +98,22 @@ export class PatternEmitter implements IPatternEmitter {
   }
 
   /**
+   * Set the maximum number of listeners for the emitter
+   * @param n - Maximum number of listeners (0 = unlimited)
+   */
+  public setMaxListeners(n: number): this {
+    this._emitter.setMaxListeners(n);
+    return this;
+  }
+
+  /**
+   * Get the maximum number of listeners for the emitter
+   */
+  public getMaxListeners(): number {
+    return this._emitter.getMaxListeners();
+  }
+
+  /**
    * Emits an event to all listeners for the specified type. In addition, if type
    * is a string, emits the event to all listeners whose patterns match. Returns
    * true if any listeners existed, false otherwise.
@@ -138,7 +154,7 @@ export class PatternEmitter implements IPatternEmitter {
     }
 
     const onceWrapper = (...rest: any[]) => {
-        listener(...rest);
+      listener(...rest);
       this.removeListener(type, onceWrapper);
     };
 
@@ -238,7 +254,7 @@ export class PatternEmitter implements IPatternEmitter {
 
     if (matchingListenersArray instanceof Array && wrapedListener) {
       const arrWithRemovedListener = matchingListenersArray.filter(value => {
-          return value !== wrapedListener;
+        return value !== wrapedListener;
       });
 
       // Clean up the mapping
@@ -364,12 +380,12 @@ export class PatternEmitter implements IPatternEmitter {
     this._regexMap.forEach((regexp: RegExp) => {
       if (regexp && regexp instanceof RegExp && regexp.test(type)) {
         regexListeners.push(...this.patternListeners(regexp));
-        }
-      });
+      }
+    });
 
     // Collect string listeners (in insertion order = idx order)
     const stringListeners: PatternListener[] = [];
-      this._emitterListeners(type).forEach(elem => {
+    this._emitterListeners(type).forEach(elem => {
       const wrapped = getByValue.bind(this)(this._actualListeners, elem);
       if (wrapped) {
         stringListeners.push(wrapped);

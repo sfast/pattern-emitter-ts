@@ -6,6 +6,7 @@ describe('PatternEmitter', () => {
 
   beforeEach(() => {
     emitter = new PatternEmitter();
+    emitter.setMaxListeners(0); // Unlimited for tests
   });
 
   describe('emit', () => {
@@ -528,6 +529,19 @@ describe('PatternEmitter', () => {
       emitter.on(pattern, testListener);
       emitter.emit('multi-test');
       expect(count).to.equal(1);
+    });
+  });
+
+  describe('max listeners', () => {
+    it('setMaxListeners sets the maximum number of listeners', () => {
+      const result = emitter.setMaxListeners(20);
+      expect(result).to.equal(emitter); // Should return this for chaining
+    });
+
+    it('getMaxListeners returns the maximum number of listeners', () => {
+      emitter.setMaxListeners(25);
+      const max = emitter.getMaxListeners();
+      expect(max).to.equal(25);
     });
   });
 });

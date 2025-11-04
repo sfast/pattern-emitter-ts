@@ -6,6 +6,7 @@ describe('Memory Leak Tests', () => {
 
   beforeEach(() => {
     emitter = new PatternEmitter();
+    emitter.setMaxListeners(0); // Unlimited for tests
   });
 
   describe('listener cleanup', () => {
