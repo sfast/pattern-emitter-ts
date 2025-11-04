@@ -415,4 +415,119 @@ describe('PatternEmitter', () => {
       expect(result.length).to.equal(0);
     });
   });
+
+  describe('symbol events', () => {
+    it('handles symbol event types correctly', () => {
+      const symbolEvent = Symbol('test');
+      let called = false;
+
+      emitter.on(symbolEvent, () => {
+        called = true;
+      });
+
+      emitter.emit(symbolEvent);
+      expect(called).to.equal(true);
+    });
+
+    it('getMatchingListeners returns empty array for symbols', () => {
+      const symbolEvent = Symbol('test');
+      emitter.on(symbolEvent, () => {});
+
+      // Access private method - symbols don't support pattern matching
+      const result = (emitter as any).getMatchingListeners(symbolEvent);
+      expect(result).to.be.instanceOf(Array);
+      expect(result.length).to.equal(0);
+    });
+  });
+
+  describe('sorted insertion optimization', () => {
+    it('maintains correct order when listeners are added in mixed order', () => {
+      const results: string[] = [];
+
+      // Add listeners normally
+      emitter.on(/test/, () => {
+        results.push('first');
+      });
+      emitter.on(/test/, () => {
+        results.push('second');
+      });
+      emitter.on(/test/, () => {
+        results.push('third');
+      });
+
+      emitter.emit('test');
+
+      expect(results).to.eql(['first', 'second', 'third']);
+    });
+
+    it('inserts listener in correct position when idx is smaller (edge case)', () => {
+      const results: number[] = [];
+      const pattern = /^edge/;
+
+      // Save the current global index
+      const PatternEmitterClass = emitter.constructor as any;
+      const originalIndex = PatternEmitterClass._globalListenerIndex;
+
+      // Add first listener with high idx
+      emitter.on(pattern, () => {
+        results.push(2);
+      });
+
+      // Manually decrease global index to simulate out-of-order insertion
+      PatternEmitterClass._globalListenerIndex = originalIndex - 100;
+
+      // Add listener with artificially low idx - this triggers lines 193-194
+      emitter.on(pattern, () => {
+        results.push(1);
+      });
+
+      // Restore global index
+      PatternEmitterClass._globalListenerIndex = originalIndex + 1;
+
+      // Add third listener
+      emitter.on(pattern, () => {
+        results.push(3);
+      });
+
+      // Emit and verify correct order
+      emitter.emit('edge-case');
+      expect(results).to.eql([1, 2, 3]);
+
+      // Restore to a safe value
+      PatternEmitterClass._globalListenerIndex = originalIndex + 100;
+    });
+  });
+
+  describe('removeListener edge cases', () => {
+    it('keeps pattern when removing one listener but others remain', () => {
+      const pattern = /^multi/;
+      const listener1 = () => {};
+      const listener2 = () => {};
+      const listener3 = () => {};
+
+      emitter.on(pattern, listener1);
+      emitter.on(pattern, listener2);
+      emitter.on(pattern, listener3);
+
+      // Remove the middle listener
+      emitter.removeListener(pattern, listener2);
+
+      const listeners = (emitter as any)._listeners;
+      const patternKey = String(pattern);
+      const remainingListeners = listeners.get(patternKey);
+
+      // Pattern should still exist with 2 listeners
+      expect(remainingListeners).to.be.instanceOf(Array);
+      expect(remainingListeners.length).to.equal(2);
+
+      // Verify it still works
+      let count = 0;
+      const testListener = () => {
+        count++;
+      };
+      emitter.on(pattern, testListener);
+      emitter.emit('multi-test');
+      expect(count).to.equal(1);
+    });
+  });
 });
