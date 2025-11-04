@@ -64,3 +64,8 @@ azure-pipelines.yml
 tmp/
 temp/
 *.tmp
+
+# Cursor
+.cursor/
+.cursorignore
+.cursorrules
