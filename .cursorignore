@@ -12,32 +12,13 @@ coverage/
 *.lcov
 .nyc_output/
 
-# IDE / Editor
-.idea/
-.vscode/
-.history/
-*.swp
-*.swo
-*~
-
-# OS
-*.DS_Store
-.DS_Store
-Thumbs.db
-
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 
-# Temporary files
-tmp/
-temp/
-*.tmp
-
-# Yarn Berry (if using)
+# Yarn Berry
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -47,5 +28,23 @@ temp/
 .pnp.*
 yarn.lock
 
-# Optional: Uncomment if you want to commit yarn.lock
-# !yarn.lock
+# Lock files
+package-lock.json
+
+# OS
+*.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE
+.idea/
+.vscode/
+.history/
+
+# Large generated files
+*.map
+

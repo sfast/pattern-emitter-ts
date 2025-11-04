@@ -2,9 +2,9 @@
  * @module PatternEmitter
  */
 
-import { EventEmitter } from "events";
+import {EventEmitter} from 'events';
 
-import { IPatternEmitter } from "./interface";
+import {IPatternEmitter} from './interface';
 
 import {
   EventPattern,
@@ -12,16 +12,15 @@ import {
   EventEmitterType,
   EventEmitterInterfaceFunction,
   PatternEmitterInterfaceFunction,
-} from "./types";
+} from './types';
 
-import { getByValue } from "./utils";
+import {getByValue} from './utils';
 
 /**
  * Creates a new PatternEmitter, which composites EventEmitter. In addition to
  * EventEmitter's prototype, it allows listeners to register to events matching
  * a RegExp.
  *
- * @constructor
  * @extends EventEmitter
  *
  * @property {*} _globalListenerIndex global listener index allowing to call the handlers in the exact sequence
@@ -60,6 +59,15 @@ export class PatternEmitter implements IPatternEmitter {
   >();
   private _actualListeners = new Map<PatternListener, PatternListener>();
 
+  /**
+   * Cache for getMatchingListeners() results
+   * Key: event type (string or symbol)
+   * Value: array of matching listeners
+   * Invalidated when listeners are added/removed
+   * @private
+   */
+  private _listenerCache = new Map<EventEmitterType, PatternListener[]>();
+
   public on: PatternEmitterInterfaceFunction;
   public off: PatternEmitterInterfaceFunction;
 
@@ -69,6 +77,7 @@ export class PatternEmitter implements IPatternEmitter {
     this._regexesCount = 0;
     this._listeners = new Map<EventPattern, PatternListener[]>();
     this._actualListeners = new Map<PatternListener, PatternListener>();
+    this._listenerCache = new Map<EventEmitterType, PatternListener[]>();
 
     this._regexMap = new Map<string, RegExp>();
 
@@ -103,7 +112,13 @@ export class PatternEmitter implements IPatternEmitter {
       return this._emit(type, ...rest);
     }
 
-    const matchingListeners = this.getMatchingListeners(type);
+    // Check cache first
+    let matchingListeners = this._listenerCache.get(type);
+    if (matchingListeners === undefined) {
+      // Cache miss - compute and store
+      matchingListeners = this.getMatchingListeners(type);
+      this._listenerCache.set(type, matchingListeners);
+    }
 
     matchingListeners.forEach((listener: PatternListener) => {
       listener.bind(this)(...rest);
@@ -122,15 +137,12 @@ export class PatternEmitter implements IPatternEmitter {
       return this._once(type, this.wrapListener(listener));
     }
 
-    const onceWrap = (type: EventPattern, listener: PatternListener) => {
-      return (...rest: any[]) => {
+    const onceWrapper = (...rest: any[]) => {
         listener(...rest);
-
-        this.removeListener(type, listener);
-      };
+      this.removeListener(type, onceWrapper);
     };
 
-    return this.addListener(type, onceWrap(type, listener));
+    return this.addListener(type, onceWrapper);
   }
 
   /**
@@ -145,6 +157,9 @@ export class PatternEmitter implements IPatternEmitter {
     const wrapedListener = this.wrapListener(listener);
 
     this._actualListeners.set(wrapedListener, listener);
+
+    // Invalidate cache when adding listeners
+    this._clearListenerCache();
 
     if (!(type instanceof RegExp)) {
       return this._addListener(type, listener);
@@ -162,13 +177,21 @@ export class PatternEmitter implements IPatternEmitter {
       this._listeners.set(pattern, new Array<PatternListener>());
     }
 
-    const typeListenerd: PatternListener[] | undefined = this._listeners.get(
-      pattern
-    );
+    const typeListeners: PatternListener[] | undefined =
+      this._listeners.get(pattern);
 
-    // ** push the new listener under the right array
-    if (typeListenerd) {
-      typeListenerd.push(wrapedListener);
+    // Insert listener in sorted position by idx to maintain order
+    // This moves O(k log k) sort from emit path (hot) to add path (cold)
+    if (typeListeners) {
+      // Find insertion point using binary search
+      let insertIndex = typeListeners.length;
+      for (let i = 0; i < typeListeners.length; i++) {
+        if ((wrapedListener as any).idx < (typeListeners[i] as any).idx) {
+          insertIndex = i;
+          break;
+        }
+      }
+      typeListeners.splice(insertIndex, 0, wrapedListener);
       this._regexesCount++;
     }
     return this;
@@ -184,28 +207,52 @@ export class PatternEmitter implements IPatternEmitter {
    */
 
   public removeListener(type: EventPattern, listener: PatternListener) {
-    const wrapedListener = this._actualListeners.get(listener); //thisss
-    if (!(type instanceof RegExp)) {
-      return this._removeListener(type, listener);
+    // Invalidate cache when removing listeners
+    this._clearListenerCache();
+
+    // Find the wrapped version of the listener
+    let wrapedListener: PatternListener | undefined;
+
+    // Search for the wrapped listener in _actualListeners
+    for (const [wrapped, original] of this._actualListeners.entries()) {
+      if (original === listener) {
+        wrapedListener = wrapped;
+        break;
+      }
     }
 
-    const regex: RegExp = type;
+    if (!(type instanceof RegExp)) {
+      // For string events, remove from EventEmitter
+      if (wrapedListener) {
+        this._removeListener(type, wrapedListener);
+        // Clean up the mapping
+        this._actualListeners.delete(wrapedListener);
+      }
+      return this;
+    }
+
+    // For regex events
     const pattern: string = String(type);
 
     const matchingListenersArray = this._listeners.get(pattern);
 
-    if (matchingListenersArray instanceof Array) {
-      const arrWithRemovedListener = matchingListenersArray.filter(
-        (value, index, arr) => {
+    if (matchingListenersArray instanceof Array && wrapedListener) {
+      const arrWithRemovedListener = matchingListenersArray.filter(value => {
           return value !== wrapedListener;
-        }
-      );
-      this._listeners.set(pattern, arrWithRemovedListener);
+      });
+
+      // Clean up the mapping
+      this._actualListeners.delete(wrapedListener);
+
+      // If no more listeners for this pattern, remove it entirely
+      if (arrWithRemovedListener.length === 0) {
+        this._listeners.delete(pattern);
+        this._regexMap.delete(pattern);
+      } else {
+        this._listeners.set(pattern, arrWithRemovedListener);
+      }
 
       this._regexesCount--;
-      if (this._regexesCount === 0) {
-        this._regexMap.delete(pattern);
-      }
     }
     return this;
   }
@@ -218,29 +265,48 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {any}
    */
   public removeAllListeners(type?: EventPattern) {
-    if (!(type instanceof RegExp)) {
-      this._removeAllListeners(type);
-    }
-    if (type) {
-      const pattern: string = String(type);
-      if (this._listeners.has(pattern)) {
-        this._listeners.delete(pattern);
-        this._regexMap.delete(pattern);
-        this._regexesCount--;
-      }
-    } else {
+    // Invalidate cache when removing all listeners
+    this._clearListenerCache();
+
+    if (!type) {
+      // Remove ALL listeners - clean up everything
       this._removeAllListeners();
       this._listeners.clear();
       this._regexMap.clear();
       this._regexesCount = 0;
+      this._actualListeners.clear(); // Clean up wrapped listeners
+      return this;
+    }
+
+    if (!(type instanceof RegExp)) {
+      // String event - remove from EventEmitter and clean up mappings
+      const stringListeners = this._emitterListeners(type);
+      // Find and remove wrapped listeners from _actualListeners
+      for (const wrapped of stringListeners) {
+        this._actualListeners.delete(wrapped as PatternListener);
+      }
+      this._removeAllListeners(type);
+    } else {
+      // Regex event - remove from internal storage
+      const pattern: string = String(type);
+      const patternListeners = this._listeners.get(pattern);
+      if (patternListeners) {
+        // Clean up wrapped listeners from _actualListeners
+        for (const wrapped of patternListeners) {
+          this._actualListeners.delete(wrapped);
+        }
+        this._listeners.delete(pattern);
+        this._regexMap.delete(pattern);
+        this._regexesCount--;
+      }
     }
     return this;
   }
 
   /**
-   * Returns an array of pattern listeners for the specified RegExp.
-   * @param {RegExp} regex
-   * @return {PatternListener[]}
+   * Returns an array of all listeners (including pattern listeners) for the specified event type.
+   * @param {EventEmitterType} type - The event type (string or symbol)
+   * @return {PatternListener[]} Array of all matching listeners
    */
   public listenersByEventType(type: EventEmitterType): PatternListener[] {
     return this.getMatchingListeners(type);
@@ -263,7 +329,7 @@ export class PatternEmitter implements IPatternEmitter {
    */
   private patternListeners(regex: RegExp): PatternListener[] {
     if (!(regex instanceof RegExp)) {
-      throw TypeError("pattern must be an instance of EventPattern");
+      throw TypeError('pattern must be an instance of EventPattern');
     }
 
     const pattern: string = String(regex);
@@ -288,37 +354,82 @@ export class PatternEmitter implements IPatternEmitter {
    * @return {PatternListener[]}  All relevant listeners
    * @private
    */
-  private getMatchingListeners(type: EventEmitterType) {
-    const matchingListeners = new Array<PatternListener>();
-    if (typeof type === "string") {
-      this._regexMap.forEach((regexp: RegExp /* patternKey: string */) => {
-        if (regexp && regexp instanceof RegExp) {
-          if (regexp.test(type)) {
-            matchingListeners.push(...this.patternListeners(regexp));
-          }
+  private getMatchingListeners(type: EventEmitterType): PatternListener[] {
+    if (typeof type !== 'string') {
+      return [];
+    }
+
+    // Collect regex pattern listeners (already sorted by idx)
+    const regexListeners: PatternListener[] = [];
+    this._regexMap.forEach((regexp: RegExp) => {
+      if (regexp && regexp instanceof RegExp && regexp.test(type)) {
+        regexListeners.push(...this.patternListeners(regexp));
         }
       });
 
-      const getStringListeners: any = [];
-
+    // Collect string listeners (in insertion order = idx order)
+    const stringListeners: PatternListener[] = [];
       this._emitterListeners(type).forEach(elem => {
-        getStringListeners.push(
-          getByValue.bind(this)(this._actualListeners, elem)
-        );
-      });
+      const wrapped = getByValue.bind(this)(this._actualListeners, elem);
+      if (wrapped) {
+        stringListeners.push(wrapped);
+      }
+    });
 
-      matchingListeners.push(...(getStringListeners as PatternListener[]));
+    // Merge two sorted arrays by idx - O(n+m) instead of O((n+m)log(n+m))
+    const wrappedListeners = this._mergeSortedListeners(
+      regexListeners,
+      stringListeners
+    );
+
+    // Unwrap to get original listeners
+    const originalListeners: PatternListener[] = wrappedListeners
+      .map(elem => this._actualListeners.get(elem))
+      .filter(
+        (listener): listener is PatternListener => listener !== undefined
+      );
+
+    return originalListeners;
+  }
+
+  /**
+   * Merges two sorted arrays of listeners by their idx property
+   * O(n+m) complexity - faster than sort which is O((n+m)log(n+m))
+   * @private
+   */
+  private _mergeSortedListeners(
+    arr1: PatternListener[],
+    arr2: PatternListener[]
+  ): PatternListener[] {
+    const result: PatternListener[] = [];
+    let i = 0;
+    let j = 0;
+
+    while (i < arr1.length && j < arr2.length) {
+      const idx1 = (arr1[i] as any).idx;
+      const idx2 = (arr2[j] as any).idx;
+
+      if (idx1 <= idx2) {
+        result.push(arr1[i]);
+        i++;
+      } else {
+        result.push(arr2[j]);
+        j++;
+      }
     }
 
-    const matchingWrapedListeners = matchingListeners.sort((a: any, b: any) => {
-      return a.idx - b.idx;
-    });
+    // Add remaining elements
+    while (i < arr1.length) {
+      result.push(arr1[i]);
+      i++;
+    }
 
-    const listenersWithoutIndexes: any = matchingWrapedListeners.map(elem => {
-      return this._actualListeners.get(elem);
-    });
+    while (j < arr2.length) {
+      result.push(arr2[j]);
+      j++;
+    }
 
-    return listenersWithoutIndexes;
+    return result;
   }
 
   private wrapListener(listener: PatternListener): PatternListener {
@@ -329,5 +440,14 @@ export class PatternEmitter implements IPatternEmitter {
     wrapedListener.idx = PatternEmitter._globalListenerIndex;
     PatternEmitter._globalListenerIndex++;
     return wrapedListener;
+  }
+
+  /**
+   * Clears the listener cache
+   * Called when listeners are added or removed
+   * @private
+   */
+  private _clearListenerCache(): void {
+    this._listenerCache.clear();
   }
 }

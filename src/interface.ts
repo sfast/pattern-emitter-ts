@@ -2,16 +2,16 @@
  * @module IPatternEmitter
  */
 
-import { EventEmitter } from "events";
+import {EventEmitter} from 'events';
 
-import { PatternEmitter } from "./patternEmitter";
+import {PatternEmitter} from './patternEmitter';
 
 import {
   EventEmitterType,
   EventPattern,
   PatternListener,
   PatternEmitterInterfaceFunction,
-} from "./types";
+} from './types';
 
 export interface IPatternEmitter {
   readonly listeners: Map<EventPattern, PatternListener[]>;
