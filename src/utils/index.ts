@@ -1,4 +1,4 @@
-import { PatternListener } from "..";
+import {PatternListener} from '..';
 
 const getByValue = (
   map: Map<PatternListener, PatternListener>,
@@ -11,4 +11,4 @@ const getByValue = (
   }
 };
 
-export { getByValue };
+export {getByValue};

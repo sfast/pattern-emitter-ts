@@ -2,9 +2,9 @@
  * @module PatternEmitter
  */
 
-import { EventEmitter } from "events";
+import {EventEmitter} from 'events';
 
-import { IPatternEmitter } from "./interface";
+import {IPatternEmitter} from './interface';
 
 import {
   EventPattern,
@@ -12,16 +12,15 @@ import {
   EventEmitterType,
   EventEmitterInterfaceFunction,
   PatternEmitterInterfaceFunction,
-} from "./types";
+} from './types';
 
-import { getByValue } from "./utils";
+import {getByValue} from './utils';
 
 /**
  * Creates a new PatternEmitter, which composites EventEmitter. In addition to
  * EventEmitter's prototype, it allows listeners to register to events matching
  * a RegExp.
  *
- * @constructor
  * @extends EventEmitter
  *
  * @property {*} _globalListenerIndex global listener index allowing to call the handlers in the exact sequence
@@ -162,9 +161,8 @@ export class PatternEmitter implements IPatternEmitter {
       this._listeners.set(pattern, new Array<PatternListener>());
     }
 
-    const typeListenerd: PatternListener[] | undefined = this._listeners.get(
-      pattern
-    );
+    const typeListenerd: PatternListener[] | undefined =
+      this._listeners.get(pattern);
 
     // ** push the new listener under the right array
     if (typeListenerd) {
@@ -238,9 +236,9 @@ export class PatternEmitter implements IPatternEmitter {
   }
 
   /**
-   * Returns an array of pattern listeners for the specified RegExp.
-   * @param {RegExp} regex
-   * @return {PatternListener[]}
+   * Returns an array of all listeners (including pattern listeners) for the specified event type.
+   * @param {EventEmitterType} type - The event type (string or symbol)
+   * @return {PatternListener[]} Array of all matching listeners
    */
   public listenersByEventType(type: EventEmitterType): PatternListener[] {
     return this.getMatchingListeners(type);
@@ -263,7 +261,7 @@ export class PatternEmitter implements IPatternEmitter {
    */
   private patternListeners(regex: RegExp): PatternListener[] {
     if (!(regex instanceof RegExp)) {
-      throw TypeError("pattern must be an instance of EventPattern");
+      throw TypeError('pattern must be an instance of EventPattern');
     }
 
     const pattern: string = String(regex);
@@ -290,7 +288,7 @@ export class PatternEmitter implements IPatternEmitter {
    */
   private getMatchingListeners(type: EventEmitterType) {
     const matchingListeners = new Array<PatternListener>();
-    if (typeof type === "string") {
+    if (typeof type === 'string') {
       this._regexMap.forEach((regexp: RegExp /* patternKey: string */) => {
         if (regexp && regexp instanceof RegExp) {
           if (regexp.test(type)) {
