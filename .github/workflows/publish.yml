@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
+          scope: '@sfast'
 
       - name: Install dependencies
         run: npm install
@@ -47,5 +48,5 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --provenance --access public
 
