@@ -1,7 +1,9 @@
 # Source files (only publish dist/)
 src/
 test/
-example/
+
+# Keep examples for users
+# example/
 
 # Dependencies
 node_modules/

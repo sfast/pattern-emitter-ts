@@ -392,12 +392,69 @@ describe('PatternEmitter', () => {
     });
   });
 
-  describe('listeners getter', () => {
-    it('exposes the internal listeners map', () => {
-      emitter.on(/test/, () => {});
-      const listeners = emitter.listeners;
-      expect(listeners).to.be.instanceOf(Map);
-      expect(listeners.size).to.be.greaterThan(0);
+  describe('listeners() method', () => {
+    it('should return listeners for a string event', () => {
+      const handler1 = () => {};
+      const handler2 = () => {};
+      
+      emitter.on('test.event', handler1);
+      emitter.on('test.event', handler2);
+      
+      const listeners = emitter.listeners('test.event');
+      expect(listeners).to.be.an('array');
+      expect(listeners).to.have.lengthOf(2);
+    });
+    
+    it('should return listeners for a RegExp pattern', () => {
+      const pattern1 = () => {};
+      const pattern2 = () => {};
+      
+      emitter.on(/test.*/, pattern1);
+      emitter.on(/test.*/, pattern2);
+      
+      const listeners = emitter.listeners(/test.*/);
+      expect(listeners).to.be.an('array');
+      expect(listeners).to.have.lengthOf(2);
+    });
+    
+    it('should return empty array when no listeners exist', () => {
+      expect(emitter.listeners('nonexistent')).to.have.lengthOf(0);
+      expect(emitter.listeners(/nonexistent/)).to.have.lengthOf(0);
+    });
+    
+    it('should work with symbol events', () => {
+      const sym = Symbol('test');
+      const handler = () => {};
+      
+      emitter.on(sym, handler);
+      
+      const listeners = emitter.listeners(sym);
+      expect(listeners).to.have.lengthOf(1);
+    });
+  });
+
+  describe('allListeners getter', () => {
+    it('exposes ALL listeners (string events and RegExp patterns)', () => {
+      const stringHandler = () => {};
+      const patternHandler = () => {};
+      
+      emitter.on('string.event', stringHandler);
+      emitter.on(/test/, patternHandler);
+      
+      const allListeners = emitter.allListeners;
+      expect(allListeners).to.be.instanceOf(Map);
+      expect(allListeners.size).to.equal(2); // 1 string + 1 pattern
+      
+      // Verify string event is included
+      expect(allListeners.has('string.event')).to.be.true;
+      // Verify pattern is included
+      expect(allListeners.has('/test/')).to.be.true;
+    });
+    
+    it('returns empty map when no listeners registered', () => {
+      const allListeners = emitter.allListeners;
+      expect(allListeners).to.be.instanceOf(Map);
+      expect(allListeners.size).to.equal(0);
     });
   });
 
@@ -542,6 +599,253 @@ describe('PatternEmitter', () => {
       emitter.setMaxListeners(25);
       const max = emitter.getMaxListeners();
       expect(max).to.equal(25);
+    });
+  });
+
+  describe('eventNames', () => {
+    it('should return empty array when no listeners are registered', () => {
+      const names = emitter.eventNames();
+      expect(names).to.be.an('array');
+      expect(names).to.have.lengthOf(0);
+    });
+
+    it('should return string event names', () => {
+      emitter.on('test.event', () => {});
+      emitter.on('another.event', () => {});
+      
+      const names = emitter.eventNames();
+      expect(names).to.have.lengthOf(2);
+      expect(names).to.include('test.event');
+      expect(names).to.include('another.event');
+    });
+
+    it('should return symbol event names', () => {
+      const sym1 = Symbol('test');
+      const sym2 = Symbol('another');
+      
+      emitter.on(sym1, () => {});
+      emitter.on(sym2, () => {});
+      
+      const names = emitter.eventNames();
+      expect(names).to.have.lengthOf(2);
+      expect(names).to.include(sym1);
+      expect(names).to.include(sym2);
+    });
+
+    it('should NOT include RegExp patterns in eventNames', () => {
+      emitter.on('string.event', () => {});
+      emitter.on(/test.*/, () => {});
+      emitter.on(/another.*/, () => {});
+      
+      const names = emitter.eventNames();
+      expect(names).to.have.lengthOf(1);
+      expect(names).to.include('string.event');
+    });
+
+    it('should update when listeners are added', () => {
+      expect(emitter.eventNames()).to.have.lengthOf(0);
+      
+      emitter.on('event1', () => {});
+      expect(emitter.eventNames()).to.have.lengthOf(1);
+      
+      emitter.on('event2', () => {});
+      expect(emitter.eventNames()).to.have.lengthOf(2);
+    });
+
+    it('should update when listeners are removed', () => {
+      const handler1 = () => {};
+      const handler2 = () => {};
+      
+      emitter.on('event1', handler1);
+      emitter.on('event2', handler2);
+      expect(emitter.eventNames()).to.have.lengthOf(2);
+      
+      emitter.off('event1', handler1);
+      expect(emitter.eventNames()).to.have.lengthOf(1);
+      expect(emitter.eventNames()).to.include('event2');
+    });
+
+    it('should update when all listeners are removed', () => {
+      emitter.on('event1', () => {});
+      emitter.on('event2', () => {});
+      expect(emitter.eventNames()).to.have.lengthOf(2);
+      
+      emitter.removeAllListeners();
+      expect(emitter.eventNames()).to.have.lengthOf(0);
+    });
+
+    it('should handle multiple listeners on same event', () => {
+      emitter.on('test', () => {});
+      emitter.on('test', () => {});
+      emitter.on('test', () => {});
+      
+      const names = emitter.eventNames();
+      expect(names).to.have.lengthOf(1);
+      expect(names[0]).to.equal('test');
+    });
+  });
+
+  describe('eventPatterns', () => {
+    it('should return empty array when no patterns are registered', () => {
+      const patterns = emitter.eventPatterns();
+      expect(patterns).to.be.an('array');
+      expect(patterns).to.have.lengthOf(0);
+    });
+
+    it('should return RegExp pattern strings', () => {
+      emitter.on(/test.*/, () => {});
+      emitter.on(/another.*/, () => {});
+      
+      const patterns = emitter.eventPatterns();
+      expect(patterns).to.have.lengthOf(2);
+      expect(patterns).to.include('/test.*/');
+      expect(patterns).to.include('/another.*/');
+    });
+
+    it('should NOT include string events in eventPatterns', () => {
+      emitter.on('string.event', () => {});
+      emitter.on(/test.*/, () => {});
+      emitter.on(/another.*/, () => {});
+      
+      const patterns = emitter.eventPatterns();
+      expect(patterns).to.have.lengthOf(2);
+      expect(patterns).to.not.include('string.event');
+    });
+
+    it('should update when patterns are added', () => {
+      expect(emitter.eventPatterns()).to.have.lengthOf(0);
+      
+      emitter.on(/pattern1.*/, () => {});
+      expect(emitter.eventPatterns()).to.have.lengthOf(1);
+      
+      emitter.on(/pattern2.*/, () => {});
+      expect(emitter.eventPatterns()).to.have.lengthOf(2);
+    });
+
+    it('should update when patterns are removed', () => {
+      const handler1 = () => {};
+      const handler2 = () => {};
+      
+      emitter.on(/pattern1.*/, handler1);
+      emitter.on(/pattern2.*/, handler2);
+      expect(emitter.eventPatterns()).to.have.lengthOf(2);
+      
+      emitter.off(/pattern1.*/, handler1);
+      expect(emitter.eventPatterns()).to.have.lengthOf(1);
+      expect(emitter.eventPatterns()).to.include('/pattern2.*/');
+    });
+
+    it('should update when all listeners are removed', () => {
+      emitter.on(/pattern1.*/, () => {});
+      emitter.on(/pattern2.*/, () => {});
+      expect(emitter.eventPatterns()).to.have.lengthOf(2);
+      
+      emitter.removeAllListeners();
+      expect(emitter.eventPatterns()).to.have.lengthOf(0);
+    });
+
+    it('should handle multiple listeners on same pattern', () => {
+      emitter.on(/test.*/, () => {});
+      emitter.on(/test.*/, () => {});
+      emitter.on(/test.*/, () => {});
+      
+      const patterns = emitter.eventPatterns();
+      expect(patterns).to.have.lengthOf(1);
+      expect(patterns[0]).to.equal('/test.*/');
+    });
+
+    it('should remove pattern when last listener is removed', () => {
+      const handler1 = () => {};
+      const handler2 = () => {};
+      const handler3 = () => {};
+      
+      emitter.on(/test.*/, handler1);
+      emitter.on(/test.*/, handler2);
+      emitter.on(/test.*/, handler3);
+      expect(emitter.eventPatterns()).to.have.lengthOf(1);
+      
+      emitter.off(/test.*/, handler1);
+      expect(emitter.eventPatterns()).to.have.lengthOf(1);
+      
+      emitter.off(/test.*/, handler2);
+      expect(emitter.eventPatterns()).to.have.lengthOf(1);
+      
+      emitter.off(/test.*/, handler3);
+      expect(emitter.eventPatterns()).to.have.lengthOf(0);
+    });
+  });
+
+  describe('eventNames and eventPatterns together', () => {
+    it('should return both string events and patterns separately', () => {
+      emitter.on('string.event1', () => {});
+      emitter.on('string.event2', () => {});
+      emitter.on(/pattern1.*/, () => {});
+      emitter.on(/pattern2.*/, () => {});
+      
+      const names = emitter.eventNames();
+      const patterns = emitter.eventPatterns();
+      
+      expect(names).to.have.lengthOf(2);
+      expect(patterns).to.have.lengthOf(2);
+      
+      expect(names).to.include('string.event1');
+      expect(names).to.include('string.event2');
+      expect(patterns).to.include('/pattern1.*/');
+      expect(patterns).to.include('/pattern2.*/');
+    });
+
+    it('should allow iterating over all handlers using both methods', () => {
+      const stringHandler1 = () => {};
+      const stringHandler2 = () => {};
+      const patternHandler1 = () => {};
+      const patternHandler2 = () => {};
+      
+      emitter.on('event1', stringHandler1);
+      emitter.on('event2', stringHandler2);
+      emitter.on(/test.*/, patternHandler1);
+      emitter.on(/another.*/, patternHandler2);
+      
+      // Get counts using public API
+      const stringEvents = emitter.eventNames();
+      const patterns = emitter.eventPatterns();
+      
+      expect(stringEvents).to.have.lengthOf(2);
+      expect(patterns).to.have.lengthOf(2);
+      
+      // Verify we can access listener count for string events
+      expect(emitter.listenerCount('event1')).to.equal(1);
+      expect(emitter.listenerCount('event2')).to.equal(1);
+      
+      // Verify we can access all listeners via the unified map
+      const allListeners = emitter.allListeners;
+      expect(allListeners.has('event1')).to.be.true;
+      expect(allListeners.has('event2')).to.be.true;
+      expect(allListeners.has('/test.*/')).to.be.true;
+      expect(allListeners.has('/another.*/')).to.be.true;
+    });
+
+    it('should handle complex scenario with mixed events', () => {
+      const sym = Symbol('test');
+      
+      emitter.on('string1', () => {});
+      emitter.on('string2', () => {});
+      emitter.on(sym, () => {});
+      emitter.on(/pattern1.*/, () => {});
+      emitter.on(/pattern2.*/, () => {});
+      
+      const names = emitter.eventNames();
+      const patterns = emitter.eventPatterns();
+      
+      // Should have 3 string/symbol events
+      expect(names).to.have.lengthOf(3);
+      expect(names).to.include('string1');
+      expect(names).to.include('string2');
+      expect(names).to.include(sym);
+      
+      // Should have 2 patterns
+      expect(patterns).to.have.lengthOf(2);
+      expect(patterns).to.include('/pattern1.*/');
+      expect(patterns).to.include('/pattern2.*/');
     });
   });
 });

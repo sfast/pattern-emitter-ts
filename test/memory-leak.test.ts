@@ -190,31 +190,33 @@ describe('Memory Leak Tests', () => {
       const listener2 = () => {};
       const listener3 = () => {};
 
-      emitter.on('test', listener1);
-      emitter.on('test', listener2);
-      emitter.on('test', listener3);
+      // Test with regex listeners (string listeners don't need tracking - optimized)
+      emitter.on(/test1/, listener1);
+      emitter.on(/test2/, listener2);
+      emitter.on(/test3/, listener3);
 
       const actualListeners = (emitter as any)._actualListeners;
       const initialSize = actualListeners.size;
       expect(initialSize).to.equal(3);
 
       // Remove one listener
-      emitter.removeListener('test', listener2);
+      emitter.removeListener(/test2/, listener2);
       expect(actualListeners.size).to.equal(2);
 
       // Remove another
-      emitter.removeListener('test', listener1);
+      emitter.removeListener(/test1/, listener1);
       expect(actualListeners.size).to.equal(1);
 
       // Remove last
-      emitter.removeListener('test', listener3);
+      emitter.removeListener(/test3/, listener3);
       expect(actualListeners.size).to.equal(0);
     });
 
     it('once() listeners are cleaned up after execution', () => {
       const listener = () => {};
 
-      emitter.once('test', listener);
+      // Test with regex listener (string listeners don't need tracking - optimized)
+      emitter.once(/test/, listener);
 
       const actualListeners = (emitter as any)._actualListeners;
       const initialSize = actualListeners.size;
@@ -224,10 +226,8 @@ describe('Memory Leak Tests', () => {
       emitter.emit('test');
 
       // After emit, once listener should be removed
-      // Note: The cleanup happens through removeListener which clears the map
-      // The size might not be exactly 0 due to wrapped listeners, but should be reduced
       const finalSize = actualListeners.size;
-      expect(finalSize).to.be.at.most(initialSize);
+      expect(finalSize).to.equal(0);
     });
   });
 

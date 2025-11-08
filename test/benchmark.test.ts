@@ -29,12 +29,6 @@ describe('Performance Benchmarks', () => {
     const endCached = process.hrtime.bigint();
     const cachedTime = Number(endCached - startCached) / 1_000_000; // Convert to ms
 
-    console.log(`\n🚀 Cache Performance Benchmark:`);
-    console.log(`   Iterations: ${iterations}`);
-    console.log(`   Cached time: ${cachedTime.toFixed(2)}ms`);
-    console.log(`   Avg per emit: ${(cachedTime / iterations).toFixed(4)}ms`);
-    console.log(`   Total calls: ${callCount}`);
-
     // Verify all listeners were called
     expect(callCount).toBe(iterations * 3); // 3 listeners per emit
 
@@ -138,12 +132,6 @@ describe('Performance Benchmarks', () => {
     }
     const end = process.hrtime.bigint();
     const totalTime = Number(end - start) / 1_000_000;
-
-    console.log(`\n🎯 Complex Pattern Cache Benchmark:`);
-    console.log(`   Patterns: 3 regex patterns`);
-    console.log(`   Iterations: ${iterations}`);
-    console.log(`   Time: ${totalTime.toFixed(2)}ms`);
-    console.log(`   Avg: ${(totalTime / iterations).toFixed(4)}ms per emit`);
 
     expect(matchCount).toBe(firstCount * iterations);
   });
